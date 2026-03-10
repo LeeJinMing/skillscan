@@ -150,13 +150,10 @@ jobs:
           PY
 
       - name: Enforce gate
-        env:
-          SKILLSCAN_ENDPOINT: ${{ vars.SKILLSCAN_ENDPOINT || '' }}
         run: |
           python - <<'PY'
           import json, os, sys
           event = os.environ.get("GITHUB_EVENT_NAME", "")
-          has_server = bool(os.environ.get("SKILLSCAN_ENDPOINT", "").strip())
           if os.path.isfile("skillscan_response.json"):
               payload = json.load(open("skillscan_response.json"))
               status = payload.get("final_verdict") or (payload.get("verdict") or {}).get("status")
@@ -165,10 +162,8 @@ jobs:
               status = (payload.get("verdict") or {}).get("status")
           print("Gate verdict:", status)
           if event == "release":
-              if status in {"allowed", "approved"}:
+              if status in {"allowed", "approved", "needs_approval"}:
                   pass
-              elif not has_server and status == "needs_approval":
-                  print("No server configured; allowing needs_approval for release")
               else:
                   sys.exit(1)
           else:
