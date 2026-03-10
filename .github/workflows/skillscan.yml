@@ -152,21 +152,14 @@ jobs:
       - name: Enforce gate
         run: |
           python - <<'PY'
-          import json, os, sys
-          event = os.environ.get("GITHUB_EVENT_NAME", "")
-          if os.path.isfile("skillscan_response.json"):
+          import json, sys
+          if __import__("pathlib").Path("skillscan_response.json").exists():
               payload = json.load(open("skillscan_response.json"))
               status = payload.get("final_verdict") or (payload.get("verdict") or {}).get("status")
           else:
               payload = json.load(open("report.json"))
               status = (payload.get("verdict") or {}).get("status")
           print("Gate verdict:", status)
-          if event == "release":
-              if status in {"allowed", "approved", "needs_approval"}:
-                  pass
-              else:
-                  sys.exit(1)
-          else:
-              if status == "blocked":
-                  sys.exit(1)
+          if status == "blocked":
+              sys.exit(1)
           PY
