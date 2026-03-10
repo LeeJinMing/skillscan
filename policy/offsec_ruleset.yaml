@@ -1,0 +1,36 @@
+# OffSec 分类规则 — 可维护关键词表，确定性规则一刀切
+# 证据输出：命中的关键词 + 位置（SKILL.md:line xx）+ 判定 category=offsec, verdict=blocked
+
+version: 1
+category: offsec
+
+detectors:
+  - id: offsec_ad
+    match_any:
+      keywords:
+        - "Active Directory"
+        - "Kerberoasting"
+        - "DCSync"
+        - "Golden Ticket"
+        - "Silver Ticket"
+        - "Pass-the-Hash"
+        - "Pass-the-Ticket"
+        - "NTLM relay"
+        - "BloodHound"
+        - "Mimikatz"
+        - "Impacket"
+        - "CrackMapExec"
+        - "Responder"
+        - "Rubeus"
+        - "域渗透"
+        - "票据伪造"
+        - "提取凭据"
+        - "credential access"
+        - "lateral movement"
+        - "privilege escalation"
+        - "red team"
+        - "penetration test"
+        - "offensive security"
+    severity: critical
+    verdict: blocked
+    tags: [offsec, identity_attack]

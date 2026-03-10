@@ -1,0 +1,103 @@
+# SkillScan API — POST /reports + POST /allowed-workflows
+# multipart 字段名定死：report, attestation_bundle。接口一旦在用户 CI 落地，不得再改，否则工单爆炸。
+
+openapi: 3.0.3
+info:
+  title: SkillScan Reports API
+  version: "1.0"
+  description: |
+    - POST /reports: multipart 字段 **report**、**attestation_bundle**（定死，不再改）。
+    - 验签必须用 cosign 或官方 SDK，禁止自研解析证书/DSSE/Rekor。
+    - identity + allowlist 为 hard requirement。
+
+servers:
+  - url: https://api.skillscan.example.com
+    description: Example (replace with real base URL)
+
+security:
+  - bearerAuth: []
+
+paths:
+  /reports:
+    post:
+      summary: Upload report + Sigstore bundle
+      description: |
+        multipart/form-data 字段名定死：**report**、**attestation_bundle**。
+        服务端顺序：cosign 验签 → issuer → identity/allowlist → report digest → schema → 业务。
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [report, attestation_bundle]
+              properties:
+                report:
+                  type: string
+                  format: binary
+                  description: report.json（v1 合同格式）
+                attestation_bundle:
+                  type: string
+                  format: binary
+                  description: cosign keyless 产出的 bundle（含证书链+签名）
+      responses:
+        "200":
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [report_id, final_verdict, approval_elevation_applied, console_url]
+                properties:
+                  report_id: { type: string }
+                  final_verdict:
+                    type: string
+                    enum: [approved, blocked, needs_approval]
+                  approval_elevation_applied: { type: boolean }
+                  console_url: { type: string }
+        "401":
+          description: Signature invalid or identity not allowed
+        "402":
+          description: Quota exceeded
+        "422":
+          description: Schema invalid or digest mismatch
+
+  /allowed-workflows:
+    post:
+      summary: 登记 allowlist（允许某 repo+workflow_path 上报）
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [org, repo, workflow_path]
+              properties:
+                org: { type: string }
+                repo: { type: string }
+                workflow_path:
+                  type: string
+                  example: ".github/workflows/skillscan.yml"
+                  description: 必须形如 .github/workflows/*.yml
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, allowed_workflow_id]
+                properties:
+                  ok: { type: boolean }
+                  allowed_workflow_id: { type: string }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

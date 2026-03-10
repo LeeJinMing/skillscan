@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkillScan Landing Page</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(13, 25, 43, 0.92);
+      --panel-2: rgba(17, 34, 60, 0.9);
+      --text: #e7edf7;
+      --muted: #9eb0c7;
+      --line: rgba(255, 255, 255, 0.1);
+      --brand: #76a9ff;
+      --brand-2: #4be1b3;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      --max: 1140px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(118, 169, 255, 0.18), transparent 32%),
+        radial-gradient(circle at top right, rgba(75, 225, 179, 0.12), transparent 24%),
+        linear-gradient(180deg, #07111f 0%, #08101b 55%, #060c14 100%);
+      line-height: 1.55;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    .wrap { width: min(var(--max), calc(100% - 32px)); margin: 0 auto; }
+    .lang-switch {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(12px);
+      background: rgba(7, 17, 31, 0.78);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .lang-switch .wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      gap: 16px;
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .nav {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-left: auto;
+      margin-right: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav a:hover { color: var(--text); }
+
+    .toggle {
+      display: inline-flex;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      gap: 4px;
+    }
+
+    .toggle button {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .toggle button.active {
+      color: #06101c;
+      background: linear-gradient(135deg, var(--brand), #c2d8ff);
+      font-weight: 600;
+    }
+
+    .page {
+      display: none;
+      padding-bottom: 72px;
+    }
+
+    .page.active { display: block; }
+
+    .hero {
+      padding: 72px 0 48px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .stat {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .card, .hero-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-copy {
+      padding: 42px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: 999px;
+      background: rgba(118, 169, 255, 0.12);
+      color: #c9dbff;
+      border: 1px solid rgba(118, 169, 255, 0.2);
+    }
+
+    h1 {
+      margin: 18px 0 16px;
+      font-size: clamp(34px, 6vw, 64px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .lead {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 18px;
+      max-width: 720px;
+    }
+
+    .supporting {
+      margin: 0 0 26px;
+      color: #c7d5e8;
+      font-size: 15px;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-weight: 600;
+      border: 1px solid var(--line);
+      transition: 0.18s ease;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #03111b;
+      border: 0;
+    }
+
+    .btn.secondary {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+    }
+
+    .hero-panel {
+      padding: 28px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .stack-item {
+      padding: 18px;
+      border-radius: 18px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+    }
+
+    .stack-item strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .flow {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .flow-step span {
+      display: inline-flex;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      align-items: center;
+      justify-content: center;
+      background: rgba(118, 169, 255, 0.18);
+      color: #d9e6ff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    section {
+      padding: 20px 0;
+    }
+
+    .section-head {
+      margin-bottom: 18px;
+      max-width: 760px;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: clamp(24px, 3.4vw, 38px);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .grid-2, .grid-3 {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .card {
+      padding: 24px;
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .card p, .card li {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .card ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .pill {
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color: #d7e1ee;
+      font-size: 14px;
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .compare .card {
+      min-height: 100%;
+    }
+
+    .compare .label {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.06);
+      color: #d1dbe8;
+    }
+
+    .compare-table {
+      margin-top: 18px;
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 14px;
+    }
+
+    .compare-table th, .compare-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .compare-table th {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .compare-table .check { color: var(--brand-2); }
+    .compare-table .cross { color: #e07a7a; }
+
+    .flow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 20px 0;
+    }
+
+    .flow-node {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(118, 169, 255, 0.12);
+      border: 1px solid rgba(118, 169, 255, 0.25);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .flow-arrow {
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .faq {
+      display: grid;
+      gap: 12px;
+    }
+
+    .faq-item {
+      padding: 18px 20px;
+      border-radius: 16px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+    }
+
+    .faq-item summary {
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .faq-item summary::-webkit-details-marker { display: none; }
+
+    .faq-item summary::after {
+      content: "+";
+      font-size: 20px;
+      color: var(--brand);
+      flex-shrink: 0;
+    }
+
+    .faq-item[open] summary::after { content: "−"; }
+
+    .faq-item p {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .site-footer {
+      margin-top: 48px;
+      padding: 32px 0 24px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .site-footer .brand { font-size: 18px; }
+
+    .site-footer .col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .site-footer .col-title {
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .site-footer a {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .site-footer a:hover { color: var(--text); }
+
+    .site-footer .copy {
+      grid-column: 1 / -1;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+
+    .card.feature-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card.feature-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--brand), var(--brand-2));
+      opacity: 0.8;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 16px;
+    }
+
+    .timeline-item {
+      padding: 18px 20px;
+      border-radius: 20px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      display: grid;
+      gap: 8px;
+    }
+
+    .timeline-item strong {
+      font-size: 18px;
+    }
+
+    .footer {
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .footer-cta {
+      margin-top: 26px;
+      padding: 36px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(118,169,255,0.12), rgba(75,225,179,0.08));
+    }
+
+    .footer-cta p {
+      margin: 10px auto 0;
+      max-width: 760px;
+      color: var(--muted);
+    }
+
+    .mini-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid, .grid-2, .grid-3, .compare, .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        display: none;
+      }
+
+      .nav-zh, .nav-en { display: none !important; }
+
+      .hero-copy, .hero-panel, .card, .footer-cta {
+        padding: 22px;
+      }
+
+      .site-footer {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .site-footer .col { align-items: center; }
+
+      .compare-table { font-size: 13px; }
+
+      .compare-table th, .compare-table td { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="lang-switch">
+    <div class="wrap">
+      <div class="brand">SkillScan</div>
+      <nav class="nav nav-zh">
+        <a href="#problem-zh">问题</a>
+        <a href="#product-zh">产品</a>
+        <a href="#capabilities-zh">能力</a>
+        <a href="#audience-zh">适合谁</a>
+        <a href="#faq-zh">FAQ</a>
+        <a href="#cta-zh">开始</a>
+      </nav>
+      <nav class="nav nav-en" style="display:none;">
+        <a href="#problem-en">Problem</a>
+        <a href="#product-en">Product</a>
+        <a href="#capabilities-en">Capabilities</a>
+        <a href="#audience-en">Audience</a>
+        <a href="#faq-en">FAQ</a>
+        <a href="#cta-en">Get started</a>
+      </nav>
+      <div class="toggle" role="tablist" aria-label="Language switch">
+        <button class="active" data-lang="zh">中文</button>
+        <button data-lang="en">English</button>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div class="page active" data-page="zh">
+      <section class="hero">
+        <div class="wrap hero-grid">
+          <div class="hero-card hero-copy">
+            <div class="eyebrow">AI agent 扩展治理</div>
+            <h1>给 AI agent 扩展内容加上准入治理。</h1>
+            <p class="lead">SkillScan 是 agent 扩展内容的准入治理与审批控制层。扫描只是开始。真正重要的是准入、审批、复审、隔离和审计。</p>
+            <p class="supporting">当前先支持 <code>skills</code>，后续扩展到 <code>MCP</code>、<code>workflow packs</code> 和其他可安装扩展。</p>
+            <div class="cta-row">
+              <a class="btn primary" href="./docs/PITCH.md">查看 Pitch</a>
+              <a class="btn secondary" href="./README.md">查看 README</a>
+            </div>
+            <div class="stats">
+              <div class="stat"><strong>准入</strong><span>先决定什么能进仓</span></div>
+              <div class="stat"><strong>审批</strong><span>高风险内容进入人工批准</span></div>
+              <div class="stat"><strong>复审</strong><span>版本变化后重新判断</span></div>
+              <div class="stat"><strong>审计</strong><span>保留每次上传和放行痕迹</span></div>
+            </div>
+          </div>
+          <div class="hero-card hero-panel">
+            <div class="stack">
+              <div class="stack-item">
+                <strong>你真正要管的，不只是风险提示</strong>
+                <div>谁能进仓、谁能安装、哪些要审批、版本变更后要不要重审，才是企业真正付钱的地方。</div>
+              </div>
+              <div class="stack-item">
+                <strong>SkillScan = 输入层 + 治理层</strong>
+                <div>Scanner 在本地或 CI 取证，Governance 在服务端做 verdict、审批、门禁和审计。</div>
+              </div>
+            </div>
+            <div class="flow-diagram">
+              <span class="flow-node">扫描</span>
+              <span class="flow-arrow">→</span>
+              <span class="flow-node">报告</span>
+              <span class="flow-arrow">→</span>
+              <span class="flow-node">verdict</span>
+              <span class="flow-arrow">→</span>
+              <span class="flow-node">审批</span>
+              <span class="flow-arrow">→</span>
+              <span class="flow-node">发布</span>
+            </div>
+            <div class="flow">
+              <div class="flow-step"><span>1</span><div>扫描扩展内容</div></div>
+              <div class="flow-step"><span>2</span><div>生成报告和证据</div></div>
+              <div class="flow-step"><span>3</span><div>计算最终 verdict</div></div>
+              <div class="flow-step"><span>4</span><div>高风险进入审批</div></div>
+              <div class="flow-step"><span>5</span><div>只有 Allowed / Approved 才能发布或安装</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="problem-zh">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>企业担心的，不只是“扩展里有没有危险命令”</h2>
+            <p>当团队开始引入 AI agent 扩展，真正的问题很快会变成治理问题，而不是单点检测问题。</p>
+          </div>
+          <div class="card">
+            <div class="pill-row">
+              <div class="pill">谁能把扩展带进组织</div>
+              <div class="pill">什么能进入共享仓库</div>
+              <div class="pill">什么能被安装到正式环境</div>
+              <div class="pill">哪些高风险内容必须人工审批</div>
+              <div class="pill">升级后旧审批是否自动失效</div>
+              <div class="pill">红队类内容是否必须隔离</div>
+              <div class="pill">审计时能不能还原是谁批准了什么</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="product-zh">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>不是一个扫描器增强版，而是一层治理控制面</h2>
+            <p>Scanner 解决“发现风险”。SkillScan 解决“发现之后，能不能进、能不能装、要不要批、出了事怎么查”。</p>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <h3>Scanner 输入层</h3>
+              <ul>
+                <li>在本地或 CI 收集证据</li>
+                <li>生成标准报告</li>
+                <li>把判断输入交给治理层</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Governance 控制层</h3>
+              <ul>
+                <li>计算 verdict</li>
+                <li>做审批和复审</li>
+                <li>做发布门禁和审计追溯</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="capabilities-zh">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>你真正需要管住的 5 件事</h2>
+            <p>企业买单的不是“检测结果”，而是“控制权”。</p>
+          </div>
+          <div class="grid-3">
+            <div class="card feature-card"><h3>准入门禁</h3><p>不合规扩展进不了仓、过不了发布。</p></div>
+            <div class="card feature-card"><h3>审批闭环</h3><p><code>needs_approval</code> 不是提示，而是可执行流程。</p></div>
+            <div class="card feature-card"><h3>版本复审</h3><p>审批绑定 <code>repo@commit</code>。版本一变就重审。</p></div>
+            <div class="card feature-card"><h3>隔离策略</h3><p>高风险内容限制在受控环境，不进入通用目录。</p></div>
+            <div class="card feature-card"><h3>审计追溯</h3><p>谁上传、谁批准、为什么放行，都能回查。</p></div>
+            <div class="card feature-card"><h3>扩展空间</h3><p>今天从 <code>skills</code> 切入，后续扩展到 <code>MCP</code> 和更多 artifacts。</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="wrap">
+          <div class="section-head">
+            <h2>为什么先从 <code>skills</code> 开始</h2>
+            <p>切口先窄，平台空间更大。先把一个场景做透，才能站住“治理层”这个位置。</p>
+          </div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <strong>现在：先从 skills 跑通闭环</strong>
+              <p>因为 <code>skills</code> 是最清楚、最容易触发治理需求、也最容易形成扫描到审批闭环的入口。</p>
+            </div>
+            <div class="timeline-item">
+              <strong>下一步：扩到 MCP 和 workflow packs</strong>
+              <p>对象会变，但治理动作不变：准入、审批、复审、隔离、审计。</p>
+            </div>
+            <div class="timeline-item">
+              <strong>长期：成为 agent extensions 的治理控制层</strong>
+              <p>不再被单一对象绑定，而是占住企业侧的扩展准入基础设施。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="audience-zh">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>适合这些团队</h2>
+            <p>如果你已经开始在团队里引入共享扩展，首页应该让你一眼知道自己是不是目标用户。</p>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <h3>平台团队</h3>
+              <p>维护共享仓库、想给扩展加发布门禁和统一流程。</p>
+            </div>
+            <div class="card">
+              <h3>安全团队</h3>
+              <p>想把高风险扩展拦在仓库和生产环境之外。</p>
+            </div>
+            <div class="card">
+              <h3>合规团队</h3>
+              <p>需要审批链、版本复审和审计可追溯能力。</p>
+            </div>
+            <div class="card">
+              <h3>产品团队</h3>
+              <p>想把 AI agent 能力带入企业场景，但不想一开始就失控。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="wrap">
+          <div class="section-head">
+            <h2>为什么不是「再做一个 scanner」</h2>
+            <p>扫描器解决「发现风险」。SkillScan 解决「发现之后，能不能进、能不能装、要不要批、出了事怎么查」。</p>
+          </div>
+          <div class="compare">
+            <div class="card">
+              <div class="label">Scanner</div>
+              <h3>发现风险</h3>
+              <ul>
+                <li>告诉你哪里可能有问题</li>
+                <li>适合做本地或 CI 检查</li>
+                <li>不天然解决审批、复审和组织级审计</li>
+              </ul>
+            </div>
+            <div class="card">
+              <div class="label">SkillScan</div>
+              <h3>管住风险怎么进入系统</h3>
+              <ul>
+                <li>把 scanner 接进治理流程</li>
+                <li>支持 verdict、审批、发布门禁和审计</li>
+                <li>更接近企业侧的治理控制层</li>
+              </ul>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th>能力</th>
+                  <th>Scanner</th>
+                  <th>SkillScan</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>发现风险</td><td class="check">✓</td><td class="check">✓</td></tr>
+                <tr><td>阻止进入生产</td><td class="cross">✗</td><td class="check">✓</td></tr>
+                <tr><td>审批闭环</td><td class="cross">✗</td><td class="check">✓</td></tr>
+                <tr><td>版本复审</td><td class="cross">✗</td><td class="check">✓</td></tr>
+                <tr><td>审计追溯</td><td class="cross">✗</td><td class="check">✓</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq-zh">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>常见问题</h2>
+          </div>
+          <div class="faq">
+            <details class="faq-item">
+              <summary>SkillScan 和普通 scanner 有什么区别？</summary>
+              <p>Scanner 只负责「发现风险」。SkillScan 在 scanner 之上加了一层治理控制：准入、审批、复审、隔离、审计。企业买单的是控制权，不只是检测结果。</p>
+            </details>
+            <details class="faq-item">
+              <summary>支持哪些类型的扩展？</summary>
+              <p>当前先支持 Cursor skills。后续会扩展到 MCP、workflow packs 等可安装扩展。治理动作（准入、审批、复审、隔离、审计）是通用的。</p>
+            </details>
+            <details class="faq-item">
+              <summary>如何集成到现有流程？</summary>
+              <p>CLI 可在本地或 CI 中扫描，生成标准报告后提交到 SkillScan 服务端。服务端计算 verdict，命中高风险则进入审批流程。只有 Allowed 或 Approved 的版本才能通过发布门禁。</p>
+            </details>
+            <details class="faq-item">
+              <summary>审批流程是怎样的？</summary>
+              <p>审批绑定 repo@commit。版本一变，旧批准自动失效，需要重新审批。支持 needs_approval 标记，高风险内容必须人工批准后才能进入安装或发布路径。</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section id="cta-zh">
+        <div class="wrap">
+          <div class="footer-cta card">
+            <h2>让 AI agent 扩展先过治理，再进生产。</h2>
+            <p>从 <code>skills</code> 开始，把准入、审批、复审和审计变成一条清晰流程。</p>
+            <div class="cta-row" style="justify-content:center;">
+              <a class="btn primary" href="./docs/WEBSITE_COPY.md">查看官网文案</a>
+              <a class="btn secondary" href="./docs/HOMEPAGE_IA.md">查看首页结构</a>
+            </div>
+            <div class="mini-links">
+              <a href="./docs/PITCH.md">Pitch</a>
+              <a href="./docs/DECK_FINAL.md">Deck Final</a>
+              <a href="./docs/DECK.md">Deck Outline</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="wrap site-footer">
+        <div>
+          <div class="brand">SkillScan</div>
+          <p style="margin:8px 0 0;color:var(--muted);font-size:14px;">AI agent 扩展治理与审批控制层</p>
+        </div>
+        <div class="col">
+          <div class="col-title">产品</div>
+          <a href="#product-zh">产品定义</a>
+          <a href="#capabilities-zh">核心能力</a>
+          <a href="#faq-zh">常见问题</a>
+        </div>
+        <div class="col">
+          <div class="col-title">资源</div>
+          <a href="./README.md">README</a>
+          <a href="./docs/PITCH.md">Pitch</a>
+          <a href="./docs/WEBSITE_COPY.md">官网文案</a>
+        </div>
+        <div class="copy">© 2025 SkillScan · 单文件静态草稿，可继续演化成正式官网</div>
+      </footer>
+    </div>
+
+    <div class="page" data-page="en">
+      <section class="hero">
+        <div class="wrap hero-grid">
+          <div class="hero-card hero-copy">
+            <div class="eyebrow">AI agent extension governance</div>
+            <h1>Govern AI agent extensions before they reach production.</h1>
+            <p class="lead">SkillScan is the governance and approval control layer for AI agent extensions. Scanning is only the first step. The real problem is admission, approval, re-review, isolation, and audit.</p>
+            <p class="supporting">It starts with <code>skills</code> today, and expands to <code>MCP</code>, <code>workflow packs</code>, and other installable artifacts over time.</p>
+            <div class="cta-row">
+              <a class="btn primary" href="./docs/PITCH.md">View Pitch</a>
+              <a class="btn secondary" href="./README.md">View README</a>
+            </div>
+            <div class="stats">
+              <div class="stat"><strong>Admission</strong><span>Decide what enters the repo first</span></div>
+              <div class="stat"><strong>Approval</strong><span>Route risky content into review</span></div>
+              <div class="stat"><strong>Re-review</strong><span>Re-check when versions change</span></div>
+              <div class="stat"><strong>Audit</strong><span>Keep every decision traceable</span></div>
+            </div>
+          </div>
+          <div class="hero-card hero-panel">
+            <div class="stack">
+              <div class="stack-item">
+                <strong>What enterprises actually need is control, not just warnings</strong>
+                <div>Who can introduce extensions, what can enter repos, what requires approval, and whether updates must be re-reviewed are the real buying points.</div>
+              </div>
+              <div class="stack-item">
+                <strong>SkillScan = input layer + governance layer</strong>
+                <div>The scanner collects evidence locally or in CI. The governance layer handles verdicts, approvals, release gates, and audit.</div>
+              </div>
+            </div>
+            <div class="flow-diagram">
+              <span class="flow-node">Scan</span>
+              <span class="flow-arrow">→</span>
+              <span class="flow-node">Report</span>
+              <span class="flow-arrow">→</span>
+              <span class="flow-node">Verdict</span>
+              <span class="flow-arrow">→</span>
+              <span class="flow-node">Approval</span>
+              <span class="flow-arrow">→</span>
+              <span class="flow-node">Release</span>
+            </div>
+            <div class="flow">
+              <div class="flow-step"><span>1</span><div>Scan extension content</div></div>
+              <div class="flow-step"><span>2</span><div>Generate report and evidence</div></div>
+              <div class="flow-step"><span>3</span><div>Compute final verdict</div></div>
+              <div class="flow-step"><span>4</span><div>Route risky versions into approval</div></div>
+              <div class="flow-step"><span>5</span><div>Only Allowed / Approved versions ship or install</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="problem-en">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Enterprises worry about more than risky commands</h2>
+            <p>Once teams start adopting AI agent extensions, the real problem quickly becomes governance, not just detection.</p>
+          </div>
+          <div class="card">
+            <div class="pill-row">
+              <div class="pill">Who can introduce extensions</div>
+              <div class="pill">What can enter shared repos</div>
+              <div class="pill">What can be installed in production</div>
+              <div class="pill">What requires manual approval</div>
+              <div class="pill">Whether approvals expire after updates</div>
+              <div class="pill">Whether high-risk content must stay isolated</div>
+              <div class="pill">Whether every decision is auditable</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="product-en">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Not just a better scanner. A governance control plane.</h2>
+            <p>A scanner answers “what risk exists.” SkillScan answers “what happens next.”</p>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <h3>Scanner input layer</h3>
+              <ul>
+                <li>Collects evidence locally or in CI</li>
+                <li>Generates a standard report</li>
+                <li>Feeds governance decisions</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Governance control layer</h3>
+              <ul>
+                <li>Computes verdicts</li>
+                <li>Handles approval and re-review</li>
+                <li>Enforces release gating and auditability</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="capabilities-en">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>The five things you actually need to control</h2>
+            <p>Enterprises pay for control, not just detection.</p>
+          </div>
+          <div class="grid-3">
+            <div class="card feature-card"><h3>Admission control</h3><p>Non-compliant extensions do not enter repos or release paths.</p></div>
+            <div class="card feature-card"><h3>Approval workflow</h3><p><code>needs_approval</code> becomes an enforceable workflow, not just a warning.</p></div>
+            <div class="card feature-card"><h3>Version-aware review</h3><p>Approval is tied to <code>repo@commit</code>. New version, new review.</p></div>
+            <div class="card feature-card"><h3>Isolation policy</h3><p>High-risk content can be restricted to controlled environments.</p></div>
+            <div class="card feature-card"><h3>Audit trail</h3><p>Every upload, approval, and release decision is traceable.</p></div>
+            <div class="card feature-card"><h3>Expansion path</h3><p>Start with <code>skills</code>, then expand into <code>MCP</code> and more artifacts.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Why start with <code>skills</code></h2>
+            <p>The wedge stays narrow so the platform story can stay credible. Solve one category deeply first, then expand.</p>
+          </div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <strong>Now: solve the loop for skills</strong>
+              <p><code>skills</code> are the clearest category to operationalize scanning, verdicts, approval, and release gates fast.</p>
+            </div>
+            <div class="timeline-item">
+              <strong>Next: expand into MCP and workflow packs</strong>
+              <p>The object type changes, but the governance actions stay the same: admission, approval, re-review, isolation, and audit.</p>
+            </div>
+            <div class="timeline-item">
+              <strong>Long term: become the control layer for agent extensions</strong>
+              <p>That is how SkillScan grows from one wedge into broader enterprise infrastructure.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="audience-en">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Built for teams like these</h2>
+            <p>If your organization is already adopting shared extensions, the homepage should make it obvious whether you are the target buyer.</p>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <h3>Platform teams</h3>
+              <p>Managing shared repositories and trying to add release gates around extensions.</p>
+            </div>
+            <div class="card">
+              <h3>Security teams</h3>
+              <p>Trying to keep risky content out of repositories and production environments.</p>
+            </div>
+            <div class="card">
+              <h3>Compliance teams</h3>
+              <p>Needing approval workflows, version-aware review, and auditability.</p>
+            </div>
+            <div class="card">
+              <h3>Product teams</h3>
+              <p>Bringing AI agent capabilities into enterprise workflows without losing control.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Why this is not just another scanner</h2>
+            <p>A scanner answers "what risk exists." SkillScan answers "what happens next."</p>
+          </div>
+          <div class="compare">
+            <div class="card">
+              <div class="label">Scanner</div>
+              <h3>Finds risk</h3>
+              <ul>
+                <li>Tells you what may be wrong</li>
+                <li>Useful in local and CI checks</li>
+                <li>Does not create approval, re-review, or organizational auditability by itself</li>
+              </ul>
+            </div>
+            <div class="card">
+              <div class="label">SkillScan</div>
+              <h3>Controls how risk enters the system</h3>
+              <ul>
+                <li>Connects scanning to governance</li>
+                <li>Supports verdicts, approval, release gating, and audit</li>
+                <li>Acts more like enterprise control infrastructure than a utility</li>
+              </ul>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th>Capability</th>
+                  <th>Scanner</th>
+                  <th>SkillScan</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Detects risk</td><td class="check">✓</td><td class="check">✓</td></tr>
+                <tr><td>Blocks production entry</td><td class="cross">✗</td><td class="check">✓</td></tr>
+                <tr><td>Approval workflow</td><td class="cross">✗</td><td class="check">✓</td></tr>
+                <tr><td>Version-aware review</td><td class="cross">✗</td><td class="check">✓</td></tr>
+                <tr><td>Audit trail</td><td class="cross">✗</td><td class="check">✓</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq-en">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>FAQ</h2>
+          </div>
+          <div class="faq">
+            <details class="faq-item">
+              <summary>What's the difference between SkillScan and a scanner?</summary>
+              <p>Scanners only detect risk. SkillScan adds a governance layer on top: admission, approval, re-review, isolation, and audit. Enterprises pay for control, not just detection.</p>
+            </details>
+            <details class="faq-item">
+              <summary>What extension types does it support?</summary>
+              <p>Currently Cursor skills. It will expand to MCP, workflow packs, and other installable artifacts. The governance actions are the same across artifact types.</p>
+            </details>
+            <details class="faq-item">
+              <summary>How do I integrate with existing workflows?</summary>
+              <p>The CLI scans locally or in CI and produces a standard report. Submit that to the SkillScan server, which computes the verdict. Risky versions require approval. Only Allowed or Approved versions pass release gates.</p>
+            </details>
+            <details class="faq-item">
+              <summary>How does the approval workflow work?</summary>
+              <p>Approval is tied to repo@commit. Version changes invalidate prior approvals. Content marked needs_approval must be manually approved before it can enter install or release paths.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section id="cta-en">
+        <div class="wrap">
+          <div class="footer-cta card">
+            <h2>Govern agent extensions before they ship.</h2>
+            <p>Start with <code>skills</code>, and turn admission, approval, re-review, and audit into one clear workflow.</p>
+            <div class="cta-row" style="justify-content:center;">
+              <a class="btn primary" href="./docs/WEBSITE_COPY.md">Website copy</a>
+              <a class="btn secondary" href="./docs/HOMEPAGE_IA.md">Homepage IA</a>
+            </div>
+            <div class="mini-links">
+              <a href="./docs/PITCH.md">Pitch</a>
+              <a href="./docs/DECK_FINAL.md">Deck Final</a>
+              <a href="./docs/DECK.md">Deck Outline</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="wrap site-footer">
+        <div>
+          <div class="brand">SkillScan</div>
+          <p style="margin:8px 0 0;color:var(--muted);font-size:14px;">Governance and approval control layer for AI agent extensions</p>
+        </div>
+        <div class="col">
+          <div class="col-title">Product</div>
+          <a href="#product-en">Product</a>
+          <a href="#capabilities-en">Capabilities</a>
+          <a href="#faq-en">FAQ</a>
+        </div>
+        <div class="col">
+          <div class="col-title">Resources</div>
+          <a href="./README.md">README</a>
+          <a href="./docs/PITCH.md">Pitch</a>
+          <a href="./docs/WEBSITE_COPY.md">Website copy</a>
+        </div>
+        <div class="copy">© 2025 SkillScan · Single-file static draft, ready to evolve into a fuller product homepage</div>
+      </footer>
+    </div>
+  </main>
+
+  <script>
+    const buttons = document.querySelectorAll(".toggle button");
+    const pages = document.querySelectorAll(".page");
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const lang = button.dataset.lang;
+        buttons.forEach((btn) => btn.classList.toggle("active", btn === button));
+        pages.forEach((page) => page.classList.toggle("active", page.dataset.page === lang));
+        document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
+        document.querySelector(".nav-zh").style.display = lang === "zh" ? "" : "none";
+        document.querySelector(".nav-en").style.display = lang === "en" ? "" : "none";
+      });
+    });
+  </script>
+</body>
+</html>

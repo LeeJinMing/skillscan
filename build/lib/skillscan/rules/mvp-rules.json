@@ -1,0 +1,131 @@
+{
+  "ruleset_version": "mvp-1",
+  "description": "10 highest-impact rules + OffSec classifier; deterministic, no AI.",
+  "block_reasons": {
+    "block-offsec-ad-playbook": "Offensive security / AD exploitation guidance",
+    "block-remote-pipe": "Remote pipe execution (curl|wget ... | bash/sh); many orgs treat as hard block"
+  },
+  "rules": [
+    {
+      "id": "block-offsec-ad-playbook",
+      "severity": "Blocked",
+      "name": "Offensive Security / AD attack playbook",
+      "block_reason": "Offensive security / AD exploitation guidance",
+      "patterns": [
+        "Active Directory\\s*(attack|攻击|渗透)",
+        "域渗透|Kerberoasting|DCSync|Golden\\s*Ticket|Silver\\s*Ticket",
+        "Pass-the-Hash|Pass-the-Ticket|NTLM\\s*relay",
+        "BloodHound|Mimikatz|Impacket|CrackMapExec|Responder|Rubeus",
+        "bloodhound|mimikatz|impacket|crackmapexec|responder|rubeus",
+        "提取凭据|窃取凭据|提取哈希|票据伪造|域管理员|持久化",
+        "extract\\s*credential|credential\\s*access|lateral\\s*movement",
+        "privilege\\s*escalation|exploitation\\s*guidance|CVE\\s*exploit",
+        "red\\s*team|pen(?:etration)?\\s*test|offensive\\s*security"
+      ],
+      "file_globs": ["*.md", "*.sh", "*.ps1", "*.py", "*.yaml", "*.yml"]
+    },
+    {
+      "id": "block-remote-pipe",
+      "severity": "Blocked",
+      "name": "Remote pipe execution",
+      "patterns": [
+        "curl\\s+.*\\|\\s*(bash|sh)\\b",
+        "wget\\s+.*\\|\\s*(bash|sh)\\b"
+      ],
+      "file_globs": ["*.md", "*.sh", "*.ps1", "*.py"]
+    },
+    {
+      "id": "block-destructive-fs",
+      "severity": "Blocked",
+      "name": "Destructive filesystem",
+      "patterns": [
+        "rm\\s+-rf\\s+/",
+        "mkfs\\.\\w+",
+        "dd\\s+if=",
+        "wipefs",
+        "chmod\\s+-R\\s+777\\s+/",
+        "chown\\s+-R\\s+[^/]+\\s+/"
+      ],
+      "file_globs": ["*.md", "*.sh", "*.ps1", "*.py"]
+    },
+    {
+      "id": "block-priv-ssh",
+      "severity": "Blocked",
+      "name": "User/privilege escalation / SSH tampering",
+      "patterns": [
+        "sshd_config",
+        "PermitRootLogin",
+        "authorized_keys",
+        "sudoers"
+      ],
+      "file_globs": ["*.md", "*.sh", "*.ps1", "*.py"]
+    },
+    {
+      "id": "approval-sudo",
+      "severity": "NeedsApproval",
+      "name": "Any sudo requirement",
+      "patterns": ["\\bsudo\\b", "需要\\s*root", "requires\\s+root", "run as root"],
+      "file_globs": ["*.md", "*.sh", "*.ps1", "*.py"]
+    },
+    {
+      "id": "approval-service",
+      "severity": "NeedsApproval",
+      "name": "Service restart/stop/enable/disable",
+      "patterns": [
+        "systemctl\\s+(restart|stop|enable|disable)",
+        "pm2\\s+(restart|delete)"
+      ],
+      "file_globs": ["*.md", "*.sh", "*.ps1", "*.py"]
+    },
+    {
+      "id": "approval-write-config",
+      "severity": "NeedsApproval",
+      "name": "Write under system config paths",
+      "patterns": [
+        "/etc/[^\\s]*",
+        "/lib/systemd/[^\\s]*",
+        "/usr/lib/systemd/[^\\s]*",
+        "/etc/nginx/[^\\s]*"
+      ],
+      "file_globs": ["*.md", "*.sh", "*.ps1", "*.py"]
+    },
+    {
+      "id": "approval-permission",
+      "severity": "NeedsApproval",
+      "name": "Permission change",
+      "patterns": ["chmod\\s+", "chown\\s+"],
+      "file_globs": ["*.md", "*.sh", "*.ps1", "*.py"]
+    },
+    {
+      "id": "approval-network",
+      "severity": "NeedsApproval",
+      "name": "Network egress / download binary",
+      "patterns": [
+        "curl\\s+-[^\\s]*o\\s|curl\\s+[^|]+\\s+-o\\s",
+        "wget\\s+[^|]+",
+        "apt\\s+install",
+        "yum\\s+install",
+        "brew\\s+install",
+        "npm\\s+install",
+        "pip\\s+install"
+      ],
+      "file_globs": ["*.md", "*.sh", "*.ps1", "*.py"]
+    },
+    {
+      "id": "allow-readonly-diagnostics",
+      "severity": "Allowed",
+      "name": "Read-only diagnostics",
+      "patterns": [
+        "systemctl\\s+status",
+        "journalctl",
+        "ss\\s+-lntp",
+        "nginx\\s+-t",
+        "\\bdig\\b",
+        "nslookup",
+        "curl\\s+-I"
+      ],
+      "file_globs": ["*.md", "*.sh", "*.ps1", "*.py"]
+    }
+  ],
+  "verdict_priority": ["Blocked", "NeedsApproval", "Allowed"]
+}

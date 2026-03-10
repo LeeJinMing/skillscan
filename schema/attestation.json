@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillscan.dev/schema/attestation.json",
+  "title": "Scan Attestation",
+  "description": "Provenance for report; scan_version, ruleset, input identity.",
+  "type": "object",
+  "required": ["scan_version", "ruleset_version", "input_hash", "generated_at"],
+  "properties": {
+    "scan_version": { "type": "string" },
+    "ruleset_version": { "type": "string" },
+    "input_hash": { "type": "string" },
+    "commit_sha": { "type": "string" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "report_path": { "type": "string", "description": "Relative path to report.json if bundled" }
+  }
+}

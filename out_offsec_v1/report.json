@@ -1,0 +1,218 @@
+{
+  "schema_version": "1.0",
+  "scanner": {
+    "name": "skillscan",
+    "version": "0.1.0",
+    "ruleset_version": "mvp-1",
+    "execution_mode": "suggest_only"
+  },
+  "source": {
+    "provider": "local",
+    "repo": "",
+    "ref": "",
+    "commit_sha": "",
+    "default_branch": "main"
+  },
+  "input_fingerprint": {
+    "type": "content-hash",
+    "sha256": "ef846b94773659a765c746ba9daf1abcdca2eafac71f142ea0c5b2fea11827f0"
+  },
+  "skill": {
+    "ecosystem": "clawdbot",
+    "path": "SKILL.md",
+    "id": "example/red-team-ad",
+    "author": "",
+    "declared_version": "0.1.0",
+    "title": "sample_skill_offsec",
+    "category": "offsec"
+  },
+  "contract_version": "2026-02-01",
+  "verdict": {
+    "status": "blocked",
+    "reason": "OffSec skills are not allowed in General repository",
+    "reason_code": "POLICY_OFFSEC_BLOCKED_IN_GENERAL",
+    "policy_version": "policy@mvp-1"
+  },
+  "explanations_mode": "OFFSEC_ONLY",
+  "repo_explanation": {
+    "title": "Release blocked by policy (OffSec content in General)",
+    "text": "This repository contains skills classified as OffSec. OffSec distribution is blocked in the General profile by policy.",
+    "checklist": [
+      "If this is for a sanctioned security exercise, move it to a RedTeam repo/profile with stricter RBAC and audit.",
+      "Remove or refactor OffSec content from the General repository.",
+      "Re-run the scan and re-attempt the release."
+    ]
+  },
+  "capabilities": {},
+  "findings": [
+    {
+      "id": "SKILL_OUTSIDE_SKILLS_DIR",
+      "severity": "medium",
+      "title": "Skills found outside skills/ directory (repo not following convention)",
+      "evidence": [
+        {
+          "file": "",
+          "line_start": 0,
+          "line_end": 0,
+          "match": "Move anchors under skills/"
+        }
+      ],
+      "recommendation": "Place all skills under skills/** for governance and discovery.",
+      "signal": "",
+      "supports": "approval_signal"
+    },
+    {
+      "id": "OFFSEC_AD",
+      "severity": "critical",
+      "title": "Offensive Security / AD attack playbook",
+      "evidence": [
+        {
+          "file": "SKILL.md",
+          "line_start": 9,
+          "line_end": 9,
+          "match": "This is a **test fixture** to verify that offensive security content is **Blocked**."
+        },
+        {
+          "file": "SKILL.md",
+          "line_start": 12,
+          "line_end": 12,
+          "match": "Keywords used to trigger OFFSEC rule: Kerberoasting, BloodHound, Mimikatz, Pass-the-Hash, NTLM relay, DCSync, Golden Ticket, Impacket, CrackMapExec, Responder, credential access, lateral movement."
+        }
+      ],
+      "signal": "offsec_hit",
+      "supports": "offsec_override",
+      "recommendation": "Move to RedTeam repository; restrict visibility to redteam group; keep suggest-only"
+    }
+  ],
+  "skills": [
+    {
+      "path": "SKILL.md",
+      "root": ".",
+      "anchor_type": "skill_md",
+      "id": "example/red-team-ad",
+      "title": "sample_skill_offsec",
+      "category": "offsec",
+      "declared_category": "unknown",
+      "effective_category": "offsec",
+      "signals": [
+        "offsec_hit"
+      ],
+      "declared_version": "0.1.0",
+      "fingerprint": {
+        "algo": "sha256",
+        "value": "0864a13bb452f85787598438b8313b37249459eeb390e76abad2b11b46d6b671"
+      },
+      "findings": [
+        {
+          "id": "OFFSEC_AD",
+          "severity": "critical",
+          "title": "Offensive Security / AD attack playbook",
+          "evidence": [
+            {
+              "file": "SKILL.md",
+              "line_start": 9,
+              "line_end": 9,
+              "match": "This is a **test fixture** to verify that offensive security content is **Blocked**."
+            },
+            {
+              "file": "SKILL.md",
+              "line_start": 12,
+              "line_end": 12,
+              "match": "Keywords used to trigger OFFSEC rule: Kerberoasting, BloodHound, Mimikatz, Pass-the-Hash, NTLM relay, DCSync, Golden Ticket, Impacket, CrackMapExec, Responder, credential access, lateral movement."
+            }
+          ],
+          "signal": "offsec_hit",
+          "supports": "offsec_override",
+          "recommendation": "Move to RedTeam repository; restrict visibility to redteam group; keep suggest-only"
+        }
+      ],
+      "verdict": {
+        "status": "blocked"
+      }
+    }
+  ],
+  "explanations": [
+    {
+      "level": "repo",
+      "title": "Release blocked by policy (OffSec content in General)",
+      "text": "This repository contains skills classified as OffSec. OffSec distribution is blocked in the General profile by policy.",
+      "checklist": [
+        "If this is for a sanctioned security exercise, move it to a RedTeam repo/profile with stricter RBAC and audit.",
+        "Remove or refactor OffSec content from the General repository.",
+        "Re-run the scan and re-attempt the release."
+      ]
+    },
+    {
+      "level": "finding",
+      "code": "OFFSEC_AD",
+      "title": "OffSec content detected (forced classification override)",
+      "text": "Content matches offensive security patterns and is treated as OffSec. In General profile, OffSec distribution is blocked by policy. Evidence: SKILL.md:9-9.",
+      "snippet": "This is a **test fixture** to verify that offensive security content is **Blocked**.",
+      "signal": "offsec_hit",
+      "supports": "offsec_override",
+      "file": "SKILL.md",
+      "line_start": 9,
+      "severity": "critical",
+      "checklist": [
+        "Is this actually for a sanctioned security exercise?",
+        "If yes, move to RedTeam repo/profile with stricter RBAC and audit.",
+        "Confirm the skill is not accessible to general production users."
+      ]
+    },
+    {
+      "level": "finding",
+      "code": "SKILL_OUTSIDE_SKILLS_DIR",
+      "title": "Anchor outside skills/ directory",
+      "text": "Skill anchor is not under the convention directory skills/**. Discovery and governance are harder; repo convention is broken.",
+      "snippet": "Move anchors under skills/",
+      "signal": "",
+      "supports": "approval_signal",
+      "file": "",
+      "line_start": 0,
+      "severity": "medium",
+      "checklist": [
+        "Is there a reason to keep skills outside skills/?",
+        "Can anchors be moved under skills/?",
+        "Is the repo convention documented for the team?"
+      ]
+    },
+    {
+      "level": "finding",
+      "code": "OFFSEC_OVERRIDE_SYNTH",
+      "title": "OffSec classification override",
+      "text": "OffSec classification override triggered by ruleset mvp-1. See console for details.",
+      "snippet": "",
+      "signal": "offsec_hit",
+      "supports": "offsec_override",
+      "file": "SKILL.md",
+      "line_start": 1,
+      "severity": "critical"
+    }
+  ],
+  "explanations_top": [
+    {
+      "level": "finding",
+      "code": "OFFSEC_AD",
+      "title": "OffSec content detected (forced classification override)",
+      "text": "Content matches offensive security patterns and is treated as OffSec. In General profile, OffSec distribution is blocked by policy. Evidence: SKILL.md:9-9.",
+      "snippet": "This is a **test fixture** to verify that offensive security content is **Blocked**.",
+      "checklist": [
+        "Is this actually for a sanctioned security exercise?",
+        "If yes, move to RedTeam repo/profile with stricter RBAC and audit.",
+        "Confirm the skill is not accessible to general production users."
+      ]
+    },
+    {
+      "level": "finding",
+      "code": "OFFSEC_OVERRIDE_SYNTH",
+      "title": "OffSec classification override",
+      "text": "OffSec classification override triggered by ruleset mvp-1. See console for details.",
+      "snippet": ""
+    }
+  ],
+  "timing": {
+    "started_at": "2026-02-01T15:54:03.454706+00:00",
+    "finished_at": "2026-02-01T15:54:03.466612+00:00",
+    "duration_ms": 11
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillscan.dev/schema/report.json",
+  "title": "Skill Scan Report",
+  "description": "CLI output; uploaded to SaaS (no source code).",
+  "type": "object",
+  "required": ["scan_version", "ruleset_version", "verdict", "skill_id", "risk_summary", "execution"],
+  "properties": {
+    "scan_version": { "type": "string" },
+    "ruleset_version": { "type": "string" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "input_type": { "type": "string", "enum": ["directory", "zip", "github_repo"] },
+    "input_hash": { "type": "string", "description": "Hash of input (dir tree or zip) for idempotence" },
+    "commit_sha": { "type": "string", "description": "If from git repo" },
+    "skill_id": { "type": "string" },
+    "skill_version": { "type": "string" },
+    "ecosystem": { "type": "string", "enum": ["moltbot", "clawdbot"] },
+    "verdict": { "type": "string", "enum": ["Allowed", "NeedsApproval", "Blocked"] },
+    "verdict_reason": { "type": "string", "description": "When Blocked: human-readable reason (e.g. Offensive security / AD exploitation guidance)" },
+    "endorsement_level": { "type": "string", "enum": ["Full", "Restricted", "None"], "description": "Full=production; Restricted=red-team/priv ops only; None=no endorsement" },
+    "execution": {
+      "type": "object",
+      "description": "Hard constraint: suggest-only by policy; no auto-execute.",
+      "required": ["mode", "enforced_by", "requested"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["suggest_only", "allow_execute"], "description": "suggest_only = only show commands; allow_execute = requires approval" },
+        "enforced_by": { "type": "string", "description": "policy | org_setting" },
+        "requested": { "type": "boolean", "description": "Whether scan/context requested execution (false = suggest only)" }
+      }
+    },
+    "risk_summary": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["rule_id", "severity"],
+        "properties": {
+          "rule_id": { "type": "string" },
+          "severity": { "type": "string", "enum": ["Blocked", "NeedsApproval", "Allowed"] },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "file": { "type": "string" },
+                "line": { "type": "integer" },
+                "snippet": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "capabilities": { "type": "object", "description": "Optional; see capability.json" }
+  }
+}

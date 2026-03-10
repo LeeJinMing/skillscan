@@ -1,0 +1,218 @@
+{
+  "schema_version": "1.0",
+  "scanner": {
+    "name": "skillscan",
+    "version": "0.1.0",
+    "ruleset_version": "mvp-1",
+    "execution_mode": "suggest_only"
+  },
+  "source": {
+    "provider": "github",
+    "repo": "demo/needs-approval",
+    "ref": "refs/heads/demo",
+    "commit_sha": "demo-sha",
+    "default_branch": "main"
+  },
+  "input_fingerprint": {
+    "type": "content-hash",
+    "sha256": "0e785c2db7d5a959f5ac438064e743263f54d481d365ec65d1b313d03662b45e"
+  },
+  "skill": {
+    "ecosystem": "clawdbot",
+    "path": "SKILL.md",
+    "id": "fixture/needs-approval-one-signal",
+    "author": "",
+    "declared_version": "0.1.0",
+    "title": "fixture_needs_approval",
+    "category": "devops"
+  },
+  "contract_version": "2026-02-01",
+  "verdict": {
+    "status": "needs_approval",
+    "reason": "",
+    "reason_code": "REQUIRES_APPROVAL_HIGH_RISK_SIGNALS",
+    "policy_version": "policy@mvp-1"
+  },
+  "explanations_mode": "APPROVAL_SIGNALS_ONLY",
+  "repo_explanation": {
+    "title": "Release requires approval",
+    "text": "High-risk operational behaviors were detected. Approval is required before publishing.",
+    "checklist": [
+      "Is the download source trusted and allowlisted (domain/repo)?",
+      "Is integrity verified (SHA256/signature) before execution?",
+      "Is there a rollback plan if installation/upgrade breaks?"
+    ]
+  },
+  "capabilities": {},
+  "findings": [
+    {
+      "id": "SKILL_OUTSIDE_SKILLS_DIR",
+      "rule_id": "skill-outside-skills-dir",
+      "severity": "medium",
+      "title": "Skills found outside skills/ directory (repo not following convention)",
+      "evidence": [
+        {
+          "file": "",
+          "line_start": 0,
+          "line_end": 0,
+          "match": "Move anchors under skills/"
+        }
+      ],
+      "recommendation": "Place all skills under skills/** for governance and discovery.",
+      "signal": "",
+      "supports": "approval_signal"
+    },
+    {
+      "id": "APPROVAL_NETWORK",
+      "rule_id": "approval-network",
+      "severity": "high",
+      "title": "Network egress / download binary",
+      "evidence": [
+        {
+          "file": "SKILL.md",
+          "line_start": 12,
+          "line_end": 12,
+          "match": "curl -sSL -o /tmp/install.sh https://example.com/install.sh\nbash /tmp/install.sh"
+        },
+        {
+          "file": "SKILL.md",
+          "line_start": 13,
+          "line_end": 13,
+          "match": "curl -sSL -o /tmp/install.sh https://example.com/install.sh"
+        }
+      ],
+      "signal": "network_download_exec",
+      "supports": "approval_signal"
+    }
+  ],
+  "skills": [
+    {
+      "path": "SKILL.md",
+      "root": ".",
+      "anchor_type": "skill_md",
+      "id": "fixture/needs-approval-one-signal",
+      "title": "fixture_needs_approval",
+      "category": "devops",
+      "declared_category": "devops",
+      "effective_category": "devops",
+      "signals": [
+        "network_download_exec"
+      ],
+      "declared_version": "0.1.0",
+      "fingerprint": {
+        "algo": "sha256",
+        "value": "d0a79f2c6a143eb075fba7483553ab51f0aaab4c7001e21232ae6fff50ba5851"
+      },
+      "findings": [
+        {
+          "id": "APPROVAL_NETWORK",
+          "rule_id": "approval-network",
+          "severity": "high",
+          "title": "Network egress / download binary",
+          "evidence": [
+            {
+              "file": "SKILL.md",
+              "line_start": 12,
+              "line_end": 12,
+              "match": "curl -sSL -o /tmp/install.sh https://example.com/install.sh\nbash /tmp/install.sh"
+            },
+            {
+              "file": "SKILL.md",
+              "line_start": 13,
+              "line_end": 13,
+              "match": "curl -sSL -o /tmp/install.sh https://example.com/install.sh"
+            }
+          ],
+          "signal": "network_download_exec",
+          "supports": "approval_signal"
+        }
+      ],
+      "verdict": {
+        "status": "needs_approval"
+      }
+    }
+  ],
+  "explanations": [
+    {
+      "level": "repo",
+      "title": "Release requires approval",
+      "text": "High-risk operational behaviors were detected. Approval is required before publishing.",
+      "checklist": [
+        "Is the download source trusted and allowlisted (domain/repo)?",
+        "Is integrity verified (SHA256/signature) before execution?",
+        "Is there a rollback plan if installation/upgrade breaks?"
+      ]
+    },
+    {
+      "level": "finding",
+      "code": "APPROVAL_NETWORK",
+      "title": "Downloads and executes remote content",
+      "text": "Remote download + immediate execution increases supply-chain and RCE risk. A compromised download source can lead to full system compromise. Evidence: SKILL.md:12-12.",
+      "snippet": "curl -sSL -o /tmp/install.sh https://example.com/install.sh\nbash /tmp/install.sh",
+      "signal": "network_download_exec",
+      "supports": "approval_signal",
+      "file": "SKILL.md",
+      "line_start": 12,
+      "severity": "high",
+      "rule_id": "approval-network",
+      "checklist": [
+        "Is the download source trusted and allowlisted (domain/repo)?",
+        "Is integrity verified (SHA256/signature) before execution?",
+        "Is there a rollback plan if installation/upgrade breaks?"
+      ]
+    },
+    {
+      "level": "finding",
+      "code": "SKILL_OUTSIDE_SKILLS_DIR",
+      "title": "Anchor outside skills/ directory",
+      "text": "Skill anchor is not under the convention directory skills/**. Discovery and governance are harder; repo convention is broken.",
+      "snippet": "Move anchors under skills/",
+      "signal": "",
+      "supports": "approval_signal",
+      "file": "",
+      "line_start": 0,
+      "severity": "medium",
+      "rule_id": "skill-outside-skills-dir",
+      "checklist": [
+        "Is there a reason to keep skills outside skills/?",
+        "Can anchors be moved under skills/?",
+        "Is the repo convention documented for the team?"
+      ]
+    }
+  ],
+  "explanations_top": [
+    {
+      "level": "finding",
+      "code": "APPROVAL_NETWORK",
+      "title": "Downloads and executes remote content",
+      "text": "Remote download + immediate execution increases supply-chain and RCE risk. A compromised download source can lead to full system compromise. Evidence: SKILL.md:12-12.",
+      "snippet": "curl -sSL -o /tmp/install.sh https://example.com/install.sh\nbash /tmp/install.sh",
+      "checklist": [
+        "Is the download source trusted and allowlisted (domain/repo)?",
+        "Is integrity verified (SHA256/signature) before execution?",
+        "Is there a rollback plan if installation/upgrade breaks?"
+      ]
+    },
+    {
+      "level": "finding",
+      "code": "SKILL_OUTSIDE_SKILLS_DIR",
+      "title": "Anchor outside skills/ directory",
+      "text": "Skill anchor is not under the convention directory skills/**. Discovery and governance are harder; repo convention is broken.",
+      "snippet": "Move anchors under skills/",
+      "checklist": [
+        "Is there a reason to keep skills outside skills/?",
+        "Can anchors be moved under skills/?",
+        "Is the repo convention documented for the team?"
+      ]
+    }
+  ],
+  "timing": {
+    "started_at": "2026-03-10T08:41:41.131308+00:00",
+    "finished_at": "2026-03-10T08:41:41.141553+00:00",
+    "duration_ms": 10
+  },
+  "debug": {
+    "blocked_subtype": "",
+    "mode_source": "explanations_mode_from"
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "schema_version": "1.0",
+  "scanner": {
+    "name": "skillscan",
+    "version": "0.1.0",
+    "ruleset_version": "mvp-1",
+    "execution_mode": "suggest_only"
+  },
+  "source": {
+    "provider": "local",
+    "repo": "",
+    "ref": "",
+    "commit_sha": "",
+    "default_branch": "main"
+  },
+  "input_fingerprint": {
+    "type": "content-hash",
+    "sha256": "7958ef0c709049303dd52c6b5e9540401a6de8aeb4205f6e13abeee6d4efb8fb"
+  },
+  "skill": {
+    "ecosystem": "clawdbot",
+    "path": "skills\\sample\\SKILL.md",
+    "id": "kowl64/linux-service-triage",
+    "author": "",
+    "declared_version": "0.1.0",
+    "title": "sample",
+    "category": "unknown"
+  },
+  "verdict": {
+    "status": "needs_approval",
+    "reason": "",
+    "policy_version": "policy@mvp-1"
+  },
+  "capabilities": {},
+  "findings": [
+    {
+      "id": "APPROVAL_SUDO",
+      "severity": "high",
+      "title": "Any sudo requirement",
+      "evidence": [
+        {
+          "file": "skills\\sample/SKILL.md",
+          "line_start": 13,
+          "line_end": 13,
+          "match": "systemctl status nginx\nsudo systemctl restart nginx"
+        },
+        {
+          "file": "skills\\sample/SKILL.md",
+          "line_start": 15,
+          "line_end": 15,
+          "match": "sudo systemctl restart nginx"
+        }
+      ]
+    },
+    {
+      "id": "APPROVAL_SERVICE",
+      "severity": "high",
+      "title": "Service restart/stop/enable/disable",
+      "evidence": [
+        {
+          "file": "skills\\sample/SKILL.md",
+          "line_start": 13,
+          "line_end": 13,
+          "match": "systemctl status nginx\nsudo systemctl restart nginx"
+        },
+        {
+          "file": "skills\\sample/SKILL.md",
+          "line_start": 15,
+          "line_end": 15,
+          "match": "sudo systemctl restart nginx"
+        }
+      ]
+    },
+    {
+      "id": "ALLOW_READONLY_DIAGNOSTICS",
+      "severity": "info",
+      "title": "Read-only diagnostics",
+      "evidence": [
+        {
+          "file": "skills\\sample/SKILL.md",
+          "line_start": 13,
+          "line_end": 13,
+          "match": "systemctl status nginx\nsudo systemctl restart nginx"
+        },
+        {
+          "file": "skills\\sample/SKILL.md",
+          "line_start": 14,
+          "line_end": 14,
+          "match": "systemctl status nginx"
+        }
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "path": "skills\\sample\\SKILL.md",
+      "root": "skills\\sample",
+      "anchor_type": "skill_md",
+      "id": "kowl64/linux-service-triage",
+      "title": "sample",
+      "category": "unknown",
+      "declared_version": "0.1.0",
+      "fingerprint": {
+        "algo": "sha256",
+        "value": "60e51c4233fd5e30249a94032bcddded8ba7a85689ce654f74501a63a26145d4"
+      },
+      "findings": [
+        {
+          "id": "APPROVAL_SUDO",
+          "severity": "high",
+          "title": "Any sudo requirement",
+          "evidence": [
+            {
+              "file": "SKILL.md",
+              "line_start": 13,
+              "line_end": 13,
+              "match": "systemctl status nginx\nsudo systemctl restart nginx"
+            },
+            {
+              "file": "SKILL.md",
+              "line_start": 15,
+              "line_end": 15,
+              "match": "sudo systemctl restart nginx"
+            }
+          ]
+        },
+        {
+          "id": "APPROVAL_SERVICE",
+          "severity": "high",
+          "title": "Service restart/stop/enable/disable",
+          "evidence": [
+            {
+              "file": "SKILL.md",
+              "line_start": 13,
+              "line_end": 13,
+              "match": "systemctl status nginx\nsudo systemctl restart nginx"
+            },
+            {
+              "file": "SKILL.md",
+              "line_start": 15,
+              "line_end": 15,
+              "match": "sudo systemctl restart nginx"
+            }
+          ]
+        },
+        {
+          "id": "ALLOW_READONLY_DIAGNOSTICS",
+          "severity": "info",
+          "title": "Read-only diagnostics",
+          "evidence": [
+            {
+              "file": "SKILL.md",
+              "line_start": 13,
+              "line_end": 13,
+              "match": "systemctl status nginx\nsudo systemctl restart nginx"
+            },
+            {
+              "file": "SKILL.md",
+              "line_start": 14,
+              "line_end": 14,
+              "match": "systemctl status nginx"
+            }
+          ]
+        }
+      ],
+      "verdict": {
+        "status": "needs_approval"
+      }
+    }
+  ],
+  "timing": {
+    "started_at": "2026-02-01T15:04:16.456640+00:00",
+    "finished_at": "2026-02-01T15:04:16.470020+00:00",
+    "duration_ms": 13
+  }
+}

@@ -1,0 +1,277 @@
+# Skill 治理扫描（SkillScan）
+
+**一句话**：SkillScan 是给 AI agent 扩展内容做准入治理与审批的控制层。首批支持 `skills`，后续可扩到 `MCP`、`workflow packs` 和其他可安装扩展。
+
+**副标题**：我们不阻止团队使用 agent 扩展；我们阻止未经批准的扩展进入组织仓库、安装目录和生产环境。
+
+它不做通用代码安全平台。它做的是 **谁能进仓、谁能安装、谁要审批、升级后要不要重审、出了事能不能审计复盘**。
+
+当前仓库先把 `skills` 这个入口做透。扫描在本地或 CI 跑，服务端只收 `report.json` 和审计信息。
+
+## 为什么会需要它
+
+企业真正担心的，不只是“扩展里有没有危险命令”。
+
+他们更关心：
+
+- 谁能把扩展引进组织
+- 什么能进仓
+- 什么能安装
+- 哪些高风险内容必须审批
+- 新版本上线时旧审批是否失效
+- 红队类内容是否必须隔离
+- 审计时能不能复盘是谁在什么时候放行了什么
+
+SkillScan 把这些问题收成一套治理控制层。
+
+## 官网式介绍
+
+**Headline**  
+给 AI agent 扩展内容加上准入治理。
+
+**Subheadline**  
+扫描只是开始。真正重要的是准入、审批、复审、隔离和审计。SkillScan 先从 `skills` 切入，后续扩展到 `MCP` 和更多 agent extensions。
+
+更多中英双语 pitch 文案见 [`docs/PITCH.md`](docs/PITCH.md)。
+
+可直接打开预览的静态页面草稿见 [`landing.html`](landing.html)。
+
+## 推荐路径
+
+只看这一条就够：
+
+1. 先用 CLI 在本地跑出 `report.json`
+2. 再把官方 workflow 接进 CI
+3. 最后再接 `server/` 做共享、审批、审计
+
+`skillscan/` 是输入层。`server/` 是治理层。
+
+## 我们到底在做什么
+
+可以把项目拆成两层来看：
+
+- **Scanner 输入层**：在本地或 CI 收集证据，产出标准报告
+- **Governance 控制层**：做准入、审批、复审、隔离、审计
+
+所以它不是“某个生态的 skill 扫描器增强版”。  
+更准确的说法是：
+
+**SkillScan 是 agent extensions 的准入治理与审批控制层，当前先从 `skills` 切入。**
+
+## Open Core 边界
+
+这个方向更适合 SkillScan。
+
+推荐边界很简单：
+
+- **开源**：单机可验证的扫描能力
+- **商业化**：组织级治理与运营能力
+
+建议开源的部分：
+
+- `skillscan/` CLI
+- 规则引擎
+- 基础规则集
+- policy / report schema
+- JSON / SARIF / Markdown 报告输出
+- `.github/workflows/skillscan.yml` 这类基础 CI 集成
+- fixtures、golden tests、规则编写指南
+
+建议商业化的部分：
+
+- `server/` 背后的组织级审批与治理能力
+- Web 管理台
+- 组织策略中心
+- RBAC / SSO / SCIM
+- 审批链、例外管理、到期复审
+- 审计归档、报表、企业连接器
+- 高级规则包、信誉与情报服务
+
+为什么这样分：
+
+- 扫描器越开源，越容易被试用、验证、集成
+- 治理层越组织化，越接近企业真实付费点
+
+一句话讲清就是：
+
+**开源的是 scanner，收费的是 governance。**
+
+当前仓库仍包含产品迭代所需的服务端代码。  
+如果后续正式按 Open Core 打包，建议以 [`OPEN_SOURCE_BOUNDARY.md`](OPEN_SOURCE_BOUNDARY.md) 和 [`docs/OPEN_CORE_ROADMAP.md`](docs/OPEN_CORE_ROADMAP.md) 作为准绳。
+
+## 10 分钟上手
+
+### 1. 安装 CLI
+
+```bash
+python -m pip install -e .
+skillscan --help
+```
+
+### 2. 扫描一个目录
+
+```bash
+skillscan scan . --output-dir ./out --html --markdown --sarif
+```
+
+输出：
+
+- `out/report.json`
+- `out/report.html`
+- `out/report.md`
+- `out/report.sarif`（GitHub Code Scanning / VS Code 可用）
+
+零配置试用（开发时）：`./scripts/quick-scan.sh` 或 `./scripts/quick-scan.sh path/to/skill`
+
+### 3. 看一个内置 demo
+
+```bash
+skillscan demo --fixture needs-approval --output-dir ./demo-out
+```
+
+### 4. 跑回归测试
+
+```bash
+python tests/test_fixtures.py
+```
+
+### 5. 规则同步（开发时）
+
+`skillscan/rules/` 与根目录 `rules/` 需保持一致：
+
+```bash
+python scripts/sync-rules.py pkg-to-root   # 发布前：包 → 根
+python scripts/sync-rules.py root-to-pkg   # 编辑根目录后：根 → 包
+```
+
+### 6. pre-commit 钩子（可选）
+
+```bash
+pip install pre-commit && pre-commit install
+```
+
+每次 commit 前自动跑 `skillscan scan .`。
+
+## 常见输入
+
+CLI 现在支持：
+
+- 本地目录：`skillscan scan ./skills/foo`
+- zip：`skillscan scan ./skill.zip`
+- GitHub repo URL：`skillscan scan https://github.com/org/repo`
+- GitHub 短地址：`skillscan scan org/repo`
+
+## 官方 CI 路径
+
+MVP 只信任固定 workflow：`.github/workflows/skillscan.yml`
+
+```bash
+.github/workflows/skillscan.yml
+```
+
+这条 workflow 负责：
+
+- 生成 `report.json`
+- 生成 `attestation.bundle`
+- 调 `POST /reports`
+- 按服务端返回的最终 verdict 决定是否放行
+
+如果你要接团队门禁，只用这一条 workflow。不要再自己拼另一套上传契约。
+
+## 适用对象
+
+当前已经落地的对象：
+
+- `skills`
+
+产品设计上预留扩展的对象：
+
+- `MCP servers`
+- `workflow packs`
+- 其他 agent extension artifacts
+
+这里的原则是：**对象可以扩，治理动作不变。**
+
+不管对象叫什么，企业真正关心的还是：
+
+- 能不能进仓
+- 能不能安装
+- 哪些需要审批
+- 哪些只能在隔离环境
+- 新版本是否必须重审
+- 审计时怎么复盘
+
+## 什么时候需要服务端
+
+只想本地验证规则：
+
+- 不需要数据库
+- 不需要 GitHub OAuth
+- 不需要 GitHub App
+
+要做团队共享、审批、审计：
+
+- 进入 [`server/README.md`](server/README.md)
+- 再看 [`docs/WHEN-TO-PROVIDE-KEYS.md`](docs/WHEN-TO-PROVIDE-KEYS.md)
+
+## 项目结构
+
+| 路径 | 作用 |
+|------|------|
+| `skillscan/` | Scanner 输入层：CLI、规则引擎、发现逻辑、报告生成 |
+| `skillscan/rules/` | 打包用规则副本（与 `rules/` 同步） |
+| `skillscan/fixtures/` | 打包用 demo 样本（与 `fixtures/` 同步） |
+| `rules/mvp-rules.json` | MVP 规则集（源） |
+| `fixtures/` | 固定测试样例 |
+| `tests/test_fixtures.py` | Golden tests |
+| `.github/workflows/skillscan.yml` | 官方 CI 工作流 |
+| `server/` | Governance 控制层：报告上传、分享页、审批、复审、审计、健康检查 |
+| `api/openapi.yaml` | 服务端接口真相源 |
+| `docs/postgres-schema.sql` | 服务端数据库表结构 |
+
+## Verdict 规则
+
+- 命中任意 Blocked 规则：`Blocked`
+- 否则命中任意 Needs Approval 规则：`Needs Approval`
+- 否则：`Allowed`
+
+审批只允许把 `needs_approval` 提升为 `approved`。  
+`blocked` 永远不能因为审批而放行。
+
+## 对外怎么讲
+
+如果你要给团队、客户或合作方介绍这个项目，建议这样说：
+
+**SkillScan 是给 AI agent 扩展内容做准入治理与审批的控制层。**
+
+补一句就够：
+
+**当前先支持 `skills`，后续扩到 `MCP`、`workflow packs` 和其他可安装扩展。**
+
+## 核心文档
+
+| 文档 | 说明 |
+|------|------|
+| [`server/README.md`](server/README.md) | 服务端本地启动、接口、健康检查、审批链 |
+| [`docs/WHEN-TO-PROVIDE-KEYS.md`](docs/WHEN-TO-PROVIDE-KEYS.md) | 什么时候需要 DB、OAuth、GitHub App |
+| [`api/openapi.yaml`](api/openapi.yaml) | 统一接口契约 |
+| [`docs/boundary-and-spec.md`](docs/boundary-and-spec.md) | 产品边界和规则设计 |
+| [`docs/attestation-and-trust.md`](docs/attestation-and-trust.md) | attestation 和信任链 |
+| [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | 生产部署、备份、回滚 |
+| [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md) | 发布前检查清单 |
+| [`OPEN_SOURCE_BOUNDARY.md`](OPEN_SOURCE_BOUNDARY.md) | 开源边界 |
+| [`docs/OPEN_CORE_ROADMAP.md`](docs/OPEN_CORE_ROADMAP.md) | Open Core 落地路线 |
+| [`DATA_COLLECTION.md`](DATA_COLLECTION.md) | 数据采集、保留、删除 |
+| [`SECURITY.md`](SECURITY.md) | 漏洞提交流程 |
+
+## 当前状态
+
+现在这套仓库已经能打通这条主链：
+
+- CLI 扫描
+- 生成可读报告
+- 官方 workflow 上传
+- 服务端返回最终 verdict
+- 登录后查看 `scans / approvals / audit`
+
+完整 E2E 要配 DB、OAuth 和 GitHub App。什么时候该配，看 [`docs/WHEN-TO-PROVIDE-KEYS.md`](docs/WHEN-TO-PROVIDE-KEYS.md)。

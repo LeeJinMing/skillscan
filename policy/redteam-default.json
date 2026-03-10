@@ -1,0 +1,23 @@
+{
+  "policy_version": "2026-02-01",
+  "profile": "redteam-default",
+  "repo_zone": "redteam",
+  "category_rules": {
+    "offsec": {
+      "verdict": "needs_approval",
+      "reason": "OffSec allowed in RedTeam after approval."
+    }
+  },
+  "requires_approval_signals": [
+    "uses_sudo",
+    "service_control",
+    "writes_system_paths",
+    "chmod_chown",
+    "credential_access",
+    "network_download_exec",
+    "shell_exec",
+    "process_injection",
+    "persistence"
+  ],
+  "default_verdict": "allowed"
+}

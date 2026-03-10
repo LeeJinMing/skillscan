@@ -1,0 +1,353 @@
+{
+  "schema_version": "1.0",
+  "scanner": {
+    "name": "skillscan",
+    "version": "0.1.0",
+    "ruleset_version": "mvp-1",
+    "execution_mode": "suggest_only"
+  },
+  "source": {
+    "provider": "local",
+    "repo": "",
+    "ref": "",
+    "commit_sha": "",
+    "default_branch": "main"
+  },
+  "input_fingerprint": {
+    "type": "content-hash",
+    "sha256": "1a9bcc10fbe2016a0caf0127a83eb55d705b5242dfdea4eb6cab0949f27f9dff"
+  },
+  "skill": {
+    "ecosystem": "clawdbot",
+    "path": "SKILL.md",
+    "id": "kowl64/linux-service-triage",
+    "author": "",
+    "declared_version": "0.1.0",
+    "title": "sample_skill",
+    "category": "unknown"
+  },
+  "contract_version": "2026-02-01",
+  "verdict": {
+    "status": "needs_approval",
+    "reason": "",
+    "reason_code": "REQUIRES_APPROVAL_HIGH_RISK_SIGNALS",
+    "policy_version": "policy@mvp-1"
+  },
+  "explanations_mode": "APPROVAL_SIGNALS_ONLY",
+  "repo_explanation": {
+    "title": "Release requires approval",
+    "text": "High-risk operational behaviors were detected. Approval is required before publishing.",
+    "checklist": [
+      "Is it restricted to maintenance windows or non-prod?",
+      "Is there a health-check and automatic rollback on failure?",
+      "Is the affected service list explicit and minimal?",
+      "Is the target scope (hosts/env) explicitly limited?",
+      "Are commands/args fixed or can user input reach the shell?",
+      "Is rollback documented (and tested) for all changes?"
+    ]
+  },
+  "capabilities": {},
+  "findings": [
+    {
+      "id": "SKILL_OUTSIDE_SKILLS_DIR",
+      "severity": "medium",
+      "title": "Skills found outside skills/ directory (repo not following convention)",
+      "evidence": [
+        {
+          "file": "",
+          "line_start": 0,
+          "line_end": 0,
+          "match": "Move anchors under skills/"
+        }
+      ],
+      "recommendation": "Place all skills under skills/** for governance and discovery.",
+      "signal": "",
+      "supports": "approval_signal"
+    },
+    {
+      "id": "APPROVAL_SUDO",
+      "severity": "high",
+      "title": "Any sudo requirement",
+      "evidence": [
+        {
+          "file": "SKILL.md",
+          "line_start": 22,
+          "line_end": 22,
+          "match": "sudo systemctl restart nginx"
+        },
+        {
+          "file": "SKILL.md",
+          "line_start": 23,
+          "line_end": 23,
+          "match": "sudo systemctl restart nginx"
+        }
+      ],
+      "signal": "uses_sudo",
+      "supports": "approval_signal"
+    },
+    {
+      "id": "APPROVAL_SERVICE",
+      "severity": "high",
+      "title": "Service restart/stop/enable/disable",
+      "evidence": [
+        {
+          "file": "SKILL.md",
+          "line_start": 22,
+          "line_end": 22,
+          "match": "sudo systemctl restart nginx"
+        },
+        {
+          "file": "SKILL.md",
+          "line_start": 23,
+          "line_end": 23,
+          "match": "sudo systemctl restart nginx"
+        }
+      ],
+      "signal": "service_control",
+      "supports": "approval_signal"
+    },
+    {
+      "id": "ALLOW_READONLY_DIAGNOSTICS",
+      "severity": "info",
+      "title": "Read-only diagnostics",
+      "evidence": [
+        {
+          "file": "SKILL.md",
+          "line_start": 15,
+          "line_end": 15,
+          "match": "systemctl status nginx\njournalctl -u nginx -n 50"
+        },
+        {
+          "file": "SKILL.md",
+          "line_start": 16,
+          "line_end": 16,
+          "match": "systemctl status nginx"
+        },
+        {
+          "file": "SKILL.md",
+          "line_start": 17,
+          "line_end": 17,
+          "match": "journalctl -u nginx -n 50"
+        }
+      ],
+      "signal": "",
+      "supports": "info"
+    }
+  ],
+  "skills": [
+    {
+      "path": "SKILL.md",
+      "root": ".",
+      "anchor_type": "skill_md",
+      "id": "kowl64/linux-service-triage",
+      "title": "sample_skill",
+      "category": "unknown",
+      "declared_category": "unknown",
+      "effective_category": "unknown",
+      "signals": [
+        "service_control",
+        "uses_sudo"
+      ],
+      "declared_version": "0.1.0",
+      "fingerprint": {
+        "algo": "sha256",
+        "value": "5e5098e902140ca8e9e434987b618b28026983a61cfe7ff4eb9f16982e6b1590"
+      },
+      "findings": [
+        {
+          "id": "APPROVAL_SUDO",
+          "severity": "high",
+          "title": "Any sudo requirement",
+          "evidence": [
+            {
+              "file": "SKILL.md",
+              "line_start": 22,
+              "line_end": 22,
+              "match": "sudo systemctl restart nginx"
+            },
+            {
+              "file": "SKILL.md",
+              "line_start": 23,
+              "line_end": 23,
+              "match": "sudo systemctl restart nginx"
+            }
+          ],
+          "signal": "uses_sudo",
+          "supports": "approval_signal"
+        },
+        {
+          "id": "APPROVAL_SERVICE",
+          "severity": "high",
+          "title": "Service restart/stop/enable/disable",
+          "evidence": [
+            {
+              "file": "SKILL.md",
+              "line_start": 22,
+              "line_end": 22,
+              "match": "sudo systemctl restart nginx"
+            },
+            {
+              "file": "SKILL.md",
+              "line_start": 23,
+              "line_end": 23,
+              "match": "sudo systemctl restart nginx"
+            }
+          ],
+          "signal": "service_control",
+          "supports": "approval_signal"
+        },
+        {
+          "id": "ALLOW_READONLY_DIAGNOSTICS",
+          "severity": "info",
+          "title": "Read-only diagnostics",
+          "evidence": [
+            {
+              "file": "SKILL.md",
+              "line_start": 15,
+              "line_end": 15,
+              "match": "systemctl status nginx\njournalctl -u nginx -n 50"
+            },
+            {
+              "file": "SKILL.md",
+              "line_start": 16,
+              "line_end": 16,
+              "match": "systemctl status nginx"
+            },
+            {
+              "file": "SKILL.md",
+              "line_start": 17,
+              "line_end": 17,
+              "match": "journalctl -u nginx -n 50"
+            }
+          ],
+          "signal": "",
+          "supports": "info"
+        }
+      ],
+      "verdict": {
+        "status": "needs_approval"
+      }
+    }
+  ],
+  "explanations": [
+    {
+      "level": "repo",
+      "title": "Release requires approval",
+      "text": "High-risk operational behaviors were detected. Approval is required before publishing.",
+      "checklist": [
+        "Is it restricted to maintenance windows or non-prod?",
+        "Is there a health-check and automatic rollback on failure?",
+        "Is the affected service list explicit and minimal?",
+        "Is the target scope (hosts/env) explicitly limited?",
+        "Are commands/args fixed or can user input reach the shell?",
+        "Is rollback documented (and tested) for all changes?"
+      ]
+    },
+    {
+      "level": "finding",
+      "code": "APPROVAL_SUDO",
+      "title": "Requires elevated privileges (sudo/admin)",
+      "text": "Running as admin increases blast radius for mistakes and injection. A bad command can modify the system globally or leak sensitive data. Evidence: SKILL.md:22-22.",
+      "snippet": "sudo systemctl restart nginx",
+      "signal": "uses_sudo",
+      "supports": "approval_signal",
+      "file": "SKILL.md",
+      "line_start": 22,
+      "severity": "high",
+      "checklist": [
+        "Is the target scope (hosts/env) explicitly limited?",
+        "Are commands/args fixed or can user input reach the shell?",
+        "Is rollback documented (and tested) for all changes?"
+      ]
+    },
+    {
+      "level": "finding",
+      "code": "APPROVAL_SERVICE",
+      "title": "Controls system services (start/stop/restart/reload)",
+      "text": "Service control can cause downtime or partial outages. Restart/reload errors can take production traffic down. Evidence: SKILL.md:22-22.",
+      "snippet": "sudo systemctl restart nginx",
+      "signal": "service_control",
+      "supports": "approval_signal",
+      "file": "SKILL.md",
+      "line_start": 22,
+      "severity": "high",
+      "checklist": [
+        "Is it restricted to maintenance windows or non-prod?",
+        "Is there a health-check and automatic rollback on failure?",
+        "Is the affected service list explicit and minimal?"
+      ]
+    },
+    {
+      "level": "finding",
+      "code": "ALLOW_READONLY_DIAGNOSTICS",
+      "title": "ALLOW_READONLY_DIAGNOSTICS",
+      "text": "Evidence: SKILL.md:15-15.",
+      "snippet": "systemctl status nginx\njournalctl -u nginx -n 50",
+      "signal": "",
+      "supports": "info",
+      "file": "SKILL.md",
+      "line_start": 15,
+      "severity": "info"
+    },
+    {
+      "level": "finding",
+      "code": "SKILL_OUTSIDE_SKILLS_DIR",
+      "title": "Anchor outside skills/ directory",
+      "text": "Skill anchor is not under the convention directory skills/**. Discovery and governance are harder; repo convention is broken.",
+      "snippet": "Move anchors under skills/",
+      "signal": "",
+      "supports": "approval_signal",
+      "file": "",
+      "line_start": 0,
+      "severity": "medium",
+      "checklist": [
+        "Is there a reason to keep skills outside skills/?",
+        "Can anchors be moved under skills/?",
+        "Is the repo convention documented for the team?"
+      ]
+    }
+  ],
+  "explanations_top": [
+    {
+      "level": "finding",
+      "code": "APPROVAL_SUDO",
+      "title": "Requires elevated privileges (sudo/admin)",
+      "text": "Running as admin increases blast radius for mistakes and injection. A bad command can modify the system globally or leak sensitive data. Evidence: SKILL.md:22-22.",
+      "snippet": "sudo systemctl restart nginx",
+      "checklist": [
+        "Is the target scope (hosts/env) explicitly limited?",
+        "Are commands/args fixed or can user input reach the shell?",
+        "Is rollback documented (and tested) for all changes?"
+      ]
+    },
+    {
+      "level": "finding",
+      "code": "APPROVAL_SERVICE",
+      "title": "Controls system services (start/stop/restart/reload)",
+      "text": "Service control can cause downtime or partial outages. Restart/reload errors can take production traffic down. Evidence: SKILL.md:22-22.",
+      "snippet": "sudo systemctl restart nginx",
+      "checklist": [
+        "Is it restricted to maintenance windows or non-prod?",
+        "Is there a health-check and automatic rollback on failure?",
+        "Is the affected service list explicit and minimal?"
+      ]
+    },
+    {
+      "level": "finding",
+      "code": "SKILL_OUTSIDE_SKILLS_DIR",
+      "title": "Anchor outside skills/ directory",
+      "text": "Skill anchor is not under the convention directory skills/**. Discovery and governance are harder; repo convention is broken.",
+      "snippet": "Move anchors under skills/",
+      "checklist": [
+        "Is there a reason to keep skills outside skills/?",
+        "Can anchors be moved under skills/?",
+        "Is the repo convention documented for the team?"
+      ]
+    }
+  ],
+  "timing": {
+    "started_at": "2026-02-01T16:42:36.142487+00:00",
+    "finished_at": "2026-02-01T16:42:36.160106+00:00",
+    "duration_ms": 17
+  }
+}

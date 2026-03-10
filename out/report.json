@@ -1,0 +1,73 @@
+{
+  "scan_version": "0.1.0",
+  "ruleset_version": "mvp-1",
+  "generated_at": "2026-02-01T14:38:54.393470+00:00",
+  "input_type": "directory",
+  "input_hash": "4198d372507c8b9d5d2f5cd40967a971",
+  "commit_sha": "",
+  "skill_id": "kowl64/linux-service-triage",
+  "skill_version": "0.1.0",
+  "ecosystem": "clawdbot",
+  "verdict": "NeedsApproval",
+  "risk_summary": [
+    {
+      "rule_id": "approval-sudo",
+      "severity": "NeedsApproval",
+      "evidence": [
+        {
+          "file": "SKILL.md",
+          "line": 22,
+          "snippet": "sudo systemctl restart nginx"
+        },
+        {
+          "file": "SKILL.md",
+          "line": 23,
+          "snippet": "sudo systemctl restart nginx"
+        }
+      ]
+    },
+    {
+      "rule_id": "approval-service",
+      "severity": "NeedsApproval",
+      "evidence": [
+        {
+          "file": "SKILL.md",
+          "line": 22,
+          "snippet": "sudo systemctl restart nginx"
+        },
+        {
+          "file": "SKILL.md",
+          "line": 23,
+          "snippet": "sudo systemctl restart nginx"
+        }
+      ]
+    },
+    {
+      "rule_id": "allow-readonly-diagnostics",
+      "severity": "Allowed",
+      "evidence": [
+        {
+          "file": "SKILL.md",
+          "line": 15,
+          "snippet": "systemctl status nginx\njournalctl -u nginx -n 50"
+        },
+        {
+          "file": "SKILL.md",
+          "line": 16,
+          "snippet": "systemctl status nginx"
+        },
+        {
+          "file": "SKILL.md",
+          "line": 17,
+          "snippet": "journalctl -u nginx -n 50"
+        }
+      ]
+    }
+  ],
+  "endorsement_level": "Restricted",
+  "execution": {
+    "mode": "suggest_only",
+    "enforced_by": "policy",
+    "requested": false
+  }
+}

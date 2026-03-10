@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkillScan Report</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; background: #0b1020; color: #e5e7eb; }
+    main { max-width: 960px; margin: 0 auto; padding: 32px 20px 48px; }
+    .card { background: #111827; border: 1px solid #1f2937; border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+    .badge { display: inline-block; padding: 6px 10px; border-radius: 999px; background: #1f2937; }
+    h1, h2 { margin-top: 0; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 12px; }
+    .meta { color: #93c5fd; margin-top: 4px; }
+    pre { white-space: pre-wrap; word-break: break-word; background: #030712; padding: 10px; border-radius: 8px; overflow-x: auto; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card">
+      <h1>SkillScan Report</h1>
+      <p class="badge">Allowed</p>
+      <div class="grid">
+        <div><strong>Repo</strong><div>demo/allowed</div></div>
+        <div><strong>Commit</strong><div>demo-sha</div></div>
+        <div><strong>Ruleset</strong><div>mvp-1</div></div>
+        <div><strong>Skills</strong><div>1</div></div>
+      </div>
+    </section>
+    <section class="card">
+      <h2>Why</h2>
+      <p>No extra reason.</p>
+      <p><strong>Reason code:</strong> OK_ALLOWED</p>
+    </section>
+    <section class="card">
+      <h2>Top Findings</h2>
+      <ul><li><strong>Skills found outside skills/ directory (repo not following convention)</strong><div class='meta'>unknown file</div><pre>Move anchors under skills/</pre></li><li><strong>Read-only diagnostics</strong><div class='meta'>SKILL.md:12</div><pre>systemctl status nginx
+journalctl -u nginx -n 20
+ss -tlnp
+curl -I http://localhost/</pre></li></ul>
+    </section>
+    <section class="card">
+      <h2>Skills</h2>
+      <ul><li><strong>fixture_allowed</strong> <span>SKILL.md</span> <span>Allowed</span></li></ul>
+    </section>
+  </main>
+</body>
+</html>

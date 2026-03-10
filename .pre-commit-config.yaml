@@ -1,0 +1,13 @@
+# Pre-commit hook for SkillScan local scan
+# Install: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  - repo: local
+    hooks:
+      - id: skillscan-scan
+        name: skillscan scan
+        entry: skillscan scan . -o .skillscan-out
+        language: system
+        pass_filenames: false
+        always_run: true

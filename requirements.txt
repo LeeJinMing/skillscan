@@ -1,0 +1,2 @@
+# skillscan CLI (MVP): no extra deps for core; add pyyaml if frontmatter parsing is extended
+# PyYAML>=6.0

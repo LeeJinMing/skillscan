@@ -1,0 +1,28 @@
+{
+  "name": "skillscan-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "test": "node --import tsx --test tests/routes.test.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.0",
+    "@fastify/cookie": "^10.0.0",
+    "@fastify/multipart": "^9.0.1",
+    "ajv": "^8.12.0",
+    "ajv-formats": "^3.0.0",
+    "fastify": "^5.0.0",
+    "p-limit": "^6.0.0",
+    "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.16.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

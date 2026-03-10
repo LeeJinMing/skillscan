@@ -1,0 +1,514 @@
+# SkillScan API 真相源
+
+openapi: 3.0.3
+info:
+  title: SkillScan API
+  version: "1.1"
+  description: |
+    SkillScan 团队使用的统一接口。
+    包含健康检查、GitHub 安装绑定、报告上传、分享页、扫描记录、审批和审计。
+
+servers:
+  - url: https://api.skillscan.example.com
+    description: Replace with your real base URL
+
+paths:
+  /healthz:
+    get:
+      summary: Liveness probe
+      security: []
+      responses:
+        "200":
+          description: Server is alive
+
+  /readyz:
+    get:
+      summary: Readiness probe
+      security: []
+      responses:
+        "200":
+          description: Returns current readiness state
+
+  /metrics:
+    get:
+      summary: Prometheus metrics
+      security: []
+      responses:
+        "200":
+          description: Prometheus text format
+          content:
+            text/plain: {}
+
+  /auth/github/start:
+    get:
+      summary: Redirect to GitHub OAuth
+      security: []
+      parameters:
+        - name: return_to
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "302":
+          description: Redirect
+
+  /auth/github/callback:
+    get:
+      summary: GitHub OAuth callback
+      security: []
+      parameters:
+        - name: code
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "302":
+          description: Redirect back to app
+        "401":
+          description: Invalid or missing code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /github/install/start:
+    post:
+      summary: Start GitHub App install flow
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [install_url]
+                properties:
+                  install_url:
+                    type: string
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /github/install/complete:
+    post:
+      summary: Complete GitHub App install binding
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [installation_id, state]
+              properties:
+                installation_id:
+                  type: integer
+                setup_action:
+                  type: string
+                state:
+                  type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Invalid request
+        "401":
+          description: Not authenticated
+        "403":
+          description: Invalid state or tenant conflict
+        "409":
+          description: Installation already linked
+
+  /github/webhooks:
+    post:
+      summary: GitHub App webhook
+      security: []
+      parameters:
+        - name: X-GitHub-Delivery
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: X-GitHub-Event
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: X-Hub-Signature-256
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Processed
+        "401":
+          description: Invalid signature
+
+  /reports:
+    post:
+      summary: Upload report and attestation bundle
+      security: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [report, attestation_bundle]
+              properties:
+                report:
+                  type: string
+                  format: binary
+                attestation_bundle:
+                  type: string
+                  format: binary
+                repo_full_name:
+                  type: string
+                  description: Fallback repo name for local/dev when cosign verify is skipped
+      responses:
+        "200":
+          description: Scan accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportsUploadResponse"
+        "401":
+          description: Signature invalid, identity not allowed, or repo not enrolled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Invalid schema or digest mismatch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          description: Rate limited
+
+  /r/{share_token}:
+    get:
+      summary: Public share page
+      security: []
+      parameters:
+        - name: share_token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: HTML or JSON summary
+          content:
+            text/html: {}
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportSummaryV1"
+        "404":
+          description: Not found
+        "410":
+          description: Expired
+
+  /scans:
+    get:
+      summary: List scans for current tenant owner
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Scan list
+        "401":
+          description: Not authenticated
+
+  /scans/{scan_id}:
+    get:
+      summary: Scan detail
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: scan_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Scan detail JSON or HTML
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScanDetail"
+            text/html: {}
+        "401":
+          description: Not authenticated
+        "404":
+          description: Not found
+
+  /approvals:
+    get:
+      summary: List scans that need approval
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Approval queue
+        "401":
+          description: Not authenticated
+
+  /approve:
+    post:
+      summary: Approve a repo@commit scope
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprovalDecisionRequest"
+      responses:
+        "200":
+          description: Approval stored
+        "400":
+          description: Invalid request
+        "401":
+          description: Not authenticated
+
+  /reject:
+    post:
+      summary: Reject a repo@commit scope
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprovalDecisionRequest"
+      responses:
+        "200":
+          description: Rejection stored
+        "400":
+          description: Invalid request
+        "401":
+          description: Not authenticated
+
+  /verdict:
+    get:
+      summary: Resolve final verdict for repo and commit
+      security: []
+      parameters:
+        - name: repo
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: commit_sha
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Final verdict
+        "400":
+          description: Invalid request
+        "404":
+          description: Scan not found
+
+  /audit:
+    get:
+      summary: List audit events for current tenant owner
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Audit items
+        "401":
+          description: Not authenticated
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: session
+
+  schemas:
+    Error:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+          enum:
+            - invalid_request
+            - not_authenticated
+            - state_invalid_or_expired
+            - tenant_owned_by_another_user
+            - installation_already_linked
+            - repo_not_enrolled
+            - quota_exceeded
+            - rate_limited
+            - invalid_signature
+            - identity_not_allowed
+            - report_digest_mismatch
+            - schema_invalid
+            - internal_error
+
+    ReportSummaryV1:
+      type: object
+      required: [v, overall_pass, violations_count, commit_sha]
+      properties:
+        v:
+          type: integer
+          const: 1
+        overall_pass:
+          type: boolean
+        violations_count:
+          type: integer
+          minimum: 0
+        top_rules:
+          type: array
+          items:
+            type: string
+        commit_sha:
+          type: string
+        run_url:
+          type: string
+          nullable: true
+        repo:
+          type: string
+        verdict_status:
+          type: string
+        reason_code:
+          type: string
+
+    Verdict:
+      type: object
+      required: [status, base_status, reason]
+      properties:
+        status:
+          type: string
+          enum: [allowed, needs_approval, approved, blocked]
+        base_status:
+          type: string
+          enum: [allowed, needs_approval, approved, blocked]
+        reason:
+          type: string
+
+    ApprovalScope:
+      type: object
+      required: [type, key, commit_sha]
+      properties:
+        type:
+          type: string
+          enum: [repo_commit]
+        key:
+          type: string
+        commit_sha:
+          type: string
+
+    ReportsUploadResponse:
+      type: object
+      required:
+        - scan_id
+        - report_id
+        - share_url
+        - console_url
+        - verdict
+        - final_verdict
+        - approval_elevation_applied
+        - overall_pass
+        - violations_count
+      properties:
+        scan_id:
+          type: string
+          format: uuid
+        report_id:
+          type: string
+          format: uuid
+        share_url:
+          type: string
+        console_url:
+          type: string
+        verdict:
+          $ref: "#/components/schemas/Verdict"
+        final_verdict:
+          type: string
+          enum: [allowed, needs_approval, approved, blocked]
+        approval_elevation_applied:
+          type: boolean
+        approval_scope_matched:
+          allOf:
+            - $ref: "#/components/schemas/ApprovalScope"
+          nullable: true
+        overall_pass:
+          type: boolean
+        violations_count:
+          type: integer
+
+    ApprovalDecisionRequest:
+      type: object
+      required: [repo, commit_sha]
+      properties:
+        repo:
+          type: string
+        commit_sha:
+          type: string
+        comment:
+          type: string
+
+    ScanDetail:
+      type: object
+      required: [scan_id, repo, commit_sha, verdict, report]
+      properties:
+        scan_id:
+          type: string
+          format: uuid
+        repo:
+          type: string
+        commit_sha:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        verdict:
+          $ref: "#/components/schemas/Verdict"
+        approval:
+          nullable: true
+        report:
+          type: object

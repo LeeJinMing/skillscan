@@ -1,0 +1,86 @@
+{
+  "ruleset_version": "2026-02-01",
+  "description": "Signal templates (English-first). One sentence why + 3-item approval checklist. Future: add i18n_key.",
+  "signal_templates": [
+    {
+      "name": "offsec_hit",
+      "title": "OffSec content detected",
+      "why": "Content matches offensive security patterns; in General profile distribution is blocked.",
+      "approval_checklist": [
+        "Is this for a sanctioned security exercise?",
+        "If yes, move to RedTeam repo/profile with RBAC and audit.",
+        "Confirm the skill is not accessible to general production users."
+      ]
+    },
+    {
+      "name": "uses_sudo",
+      "title": "Requires elevated privileges",
+      "why": "Skill runs with admin privileges; mistakes or injection increase blast radius.",
+      "approval_checklist": [
+        "Is the target scope (hosts/env) explicitly limited?",
+        "Are commands/args fixed or can user input reach the shell?",
+        "Is rollback documented (and tested) for all changes?"
+      ]
+    },
+    {
+      "name": "service_control",
+      "title": "Controls system services",
+      "why": "Service control can cause downtime or partial outages.",
+      "approval_checklist": [
+        "Is it restricted to maintenance windows or non-prod?",
+        "Is there a health-check and automatic rollback on failure?",
+        "Is the affected service list explicit and minimal?"
+      ]
+    },
+    {
+      "name": "writes_system_paths",
+      "title": "Writes to system paths",
+      "why": "System path changes are high-impact and hard to roll back safely.",
+      "approval_checklist": [
+        "List exact target paths and file diffs.",
+        "Confirm backup/rollback procedure is documented and tested.",
+        "Can it be changed to write under an application directory instead?"
+      ]
+    },
+    {
+      "name": "chmod_chown",
+      "title": "Changes permissions/ownership",
+      "why": "Permission changes can unintentionally grant broader access.",
+      "approval_checklist": [
+        "Before/after permissions listed?",
+        "Applies only to required files/dirs (not recursive wildcards)?",
+        "Is there a rollback script to restore permissions?"
+      ]
+    },
+    {
+      "name": "network_download_exec",
+      "title": "Downloads and executes remote content",
+      "why": "Remote download + immediate execution increases supply-chain and RCE risk.",
+      "approval_checklist": [
+        "Is the download source trusted and allowlisted (domain/repo)?",
+        "Is integrity verified (SHA256/signature) before execution?",
+        "Is there a rollback plan if installation/upgrade breaks?"
+      ]
+    },
+    {
+      "name": "shell_exec",
+      "title": "Executes shell commands",
+      "why": "Shell execution is prone to injection and hard to sandbox.",
+      "approval_checklist": [
+        "Are inputs sanitized/escaped and strictly validated?",
+        "Can this be replaced with a safe API call or a fixed command set?",
+        "Is command output logged for audit?"
+      ]
+    },
+    {
+      "name": "credential_access",
+      "title": "Accesses credentials/secrets",
+      "why": "Handling secrets increases leakage risk.",
+      "approval_checklist": [
+        "Are secrets sourced from a secure store (not plaintext files)?",
+        "Are secrets masked in logs and outputs?",
+        "Is the minimum required permission used (scoped tokens)?"
+      ]
+    }
+  ]
+}

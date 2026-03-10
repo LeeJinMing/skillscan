@@ -1,0 +1,184 @@
+{
+  "ruleset_version": "2026-02-01",
+  "description": "Finding templates (English-first). One sentence risk + one sentence impact + 3-item approval checklist. Future: add i18n_key, keep English as fallback.",
+  "finding_templates": [
+    {
+      "code": "BLOCK_DESTRUCTIVE_FS",
+      "severity": "critical",
+      "signal": "",
+      "title": "Destructive filesystem (blocked)",
+      "risk_summary": "Commands like rm -rf /, mkfs, wipefs can destroy runner, workspace, or production data.",
+      "impact_summary": "Unbounded destructive operations may cause irreversible data loss.",
+      "detail_tpl": "Evidence: {file}:{line_start}-{line_end}.",
+      "remediation_tpl": "Confirm paths are allowlisted; use isolated env for destructive ops.",
+      "approval_checklist": [
+        "Confirm target paths are explicit and allowlisted (no wildcards on /).",
+        "Run destructive operations only in isolated env (ephemeral runner, sandbox)."
+      ]
+    },
+    {
+      "code": "BLOCK_PRIV_SSH",
+      "severity": "critical",
+      "signal": "",
+      "title": "Privilege/SSH tampering (blocked)",
+      "risk_summary": "Plaintext or long-lived private keys, sshd_config, authorized_keys increase credential and persistence risk.",
+      "impact_summary": "SSH/key tampering can enable lateral movement or persistent access.",
+      "detail_tpl": "Evidence: {file}:{line_start}-{line_end}.",
+      "remediation_tpl": "Use short-lived credentials, secret manager, or read-only deploy keys.",
+      "approval_checklist": [
+        "Use short-lived credentials or secret manager; avoid long-lived private keys in skill.",
+        "Prefer read-only deploy keys; do not modify sshd_config or authorized_keys from skill."
+      ]
+    },
+    {
+      "code": "BLOCK_REMOTE_PIPE",
+      "severity": "critical",
+      "signal": "",
+      "title": "Remote pipe execution (blocked)",
+      "risk_summary": "curl|wget ... | bash/sh is treated as a hard block by many orgs (supply-chain/RCE risk).",
+      "impact_summary": "Remote content executed without integrity check can compromise the system.",
+      "detail_tpl": "Evidence: {file}:{line_start}-{line_end}.",
+      "remediation_tpl": "Download to file, verify checksum/signature, then execute; or use a trusted install path.",
+      "approval_checklist": [
+        "Remove remote pipe pattern (curl|wget ... | bash/sh).",
+        "Use download-then-verify-then-run with fixed artifact.",
+        "Re-run scan and re-attempt release."
+      ]
+    },
+    {
+      "code": "OFFSEC_AD",
+      "severity": "critical",
+      "signal": "offsec_hit",
+      "title": "OffSec content detected (forced classification override)",
+      "risk_summary": "Content matches offensive security patterns and is treated as OffSec.",
+      "impact_summary": "In General profile, OffSec distribution is blocked by policy.",
+      "detail_tpl": "Evidence: {file}:{line_start}-{line_end}.",
+      "remediation_tpl": "If this is for a sanctioned security exercise, move to RedTeam repo/profile with stricter RBAC and audit.",
+      "approval_checklist": [
+        "Is this actually for a sanctioned security exercise?",
+        "If yes, move to RedTeam repo/profile with stricter RBAC and audit.",
+        "Confirm the skill is not accessible to general production users."
+      ]
+    },
+    {
+      "code": "APPROVAL_SUDO",
+      "severity": "high",
+      "signal": "uses_sudo",
+      "title": "Requires elevated privileges (sudo/admin)",
+      "risk_summary": "Running as admin increases blast radius for mistakes and injection.",
+      "impact_summary": "A bad command can modify the system globally or leak sensitive data.",
+      "detail_tpl": "Evidence: {file}:{line_start}-{line_end}.",
+      "remediation_tpl": "Limit scope (hosts/env), use least privilege, document and test rollback.",
+      "approval_checklist": [
+        "Is the target scope (hosts/env) explicitly limited?",
+        "Are commands/args fixed or can user input reach the shell?",
+        "Is rollback documented (and tested) for all changes?"
+      ]
+    },
+    {
+      "code": "APPROVAL_SERVICE",
+      "severity": "high",
+      "signal": "service_control",
+      "title": "Controls system services (start/stop/restart/reload)",
+      "risk_summary": "Service control can cause downtime or partial outages.",
+      "impact_summary": "Restart/reload errors can take production traffic down.",
+      "detail_tpl": "Evidence: {file}:{line_start}-{line_end}.",
+      "remediation_tpl": "Restrict to maintenance windows or non-prod; add health-check and automatic rollback on failure.",
+      "approval_checklist": [
+        "Is it restricted to maintenance windows or non-prod?",
+        "Is there a health-check and automatic rollback on failure?",
+        "Is the affected service list explicit and minimal?"
+      ]
+    },
+    {
+      "code": "APPROVAL_WRITE_CONFIG",
+      "severity": "high",
+      "signal": "writes_system_paths",
+      "title": "Writes to system directories",
+      "risk_summary": "Modifying system directories can create persistence or break OS-level behavior.",
+      "impact_summary": "System integrity and security boundaries may be compromised.",
+      "detail_tpl": "Evidence: {file}:{line_start}-{line_end}.",
+      "remediation_tpl": "Provide exact paths and file diffs; document backup and rollback; consider writing under an application directory instead.",
+      "approval_checklist": [
+        "Exact paths + file diffs provided?",
+        "Backup + rollback steps included?",
+        "Can changes be scoped to app directories instead?"
+      ]
+    },
+    {
+      "code": "APPROVAL_PERMISSION",
+      "severity": "high",
+      "signal": "chmod_chown",
+      "title": "Changes file permissions/ownership",
+      "risk_summary": "Permission changes can unintentionally grant broader access.",
+      "impact_summary": "May enable privilege escalation or data exposure.",
+      "detail_tpl": "Evidence: {file}:{line_start}-{line_end}.",
+      "remediation_tpl": "List before/after permissions; apply only to required files/dirs (no recursive wildcards); provide rollback script.",
+      "approval_checklist": [
+        "Before/after permissions listed?",
+        "Applies only to required files/dirs (not recursive wildcards)?",
+        "Is there a rollback script to restore permissions?"
+      ]
+    },
+    {
+      "code": "APPROVAL_NETWORK",
+      "severity": "high",
+      "signal": "network_download_exec",
+      "title": "Downloads and executes remote content",
+      "risk_summary": "Remote download + immediate execution increases supply-chain and RCE risk.",
+      "impact_summary": "A compromised download source can lead to full system compromise.",
+      "detail_tpl": "Evidence: {file}:{line_start}-{line_end}.",
+      "remediation_tpl": "Pin artifacts (checksum/signature), use a trusted mirror, and separate download/verify/execute steps.",
+      "approval_checklist": [
+        "Is the download source trusted and allowlisted (domain/repo)?",
+        "Is integrity verified (SHA256/signature) before execution?",
+        "Is there a rollback plan if installation/upgrade breaks?"
+      ]
+    },
+    {
+      "code": "SKILL_TOO_LARGE",
+      "severity": "high",
+      "signal": null,
+      "title": "Skill file set exceeds limit",
+      "risk_summary": "Single skill file count or total size exceeds governance limit.",
+      "impact_summary": "Governance and audit cost is high; may indicate unbounded scope.",
+      "detail_tpl": "Evidence: {file}; {match}",
+      "remediation_tpl": "Reduce to under 2000 files and 50MB; or split into multiple skills.",
+      "approval_checklist": [
+        "Is the scope justified and documented?",
+        "Can the skill be split into smaller units?",
+        "Is there an inventory of what is included?"
+      ]
+    },
+    {
+      "code": "SKILL_NESTED_DETECTED",
+      "severity": "medium",
+      "signal": null,
+      "title": "Nested skill detected",
+      "risk_summary": "Nested skill directories make governance boundaries unclear.",
+      "impact_summary": "Approval and catalog scope may be ambiguous.",
+      "detail_tpl": "Evidence: {file}; root={match}",
+      "remediation_tpl": "Flatten directory structure or document nested scope explicitly.",
+      "approval_checklist": [
+        "Is the nested scope documented?",
+        "Is it clear which paths belong to which skill?",
+        "Can the structure be flattened?"
+      ]
+    },
+    {
+      "code": "SKILL_OUTSIDE_SKILLS_DIR",
+      "severity": "medium",
+      "signal": null,
+      "title": "Anchor outside skills/ directory",
+      "risk_summary": "Skill anchor is not under the convention directory skills/**.",
+      "impact_summary": "Discovery and governance are harder; repo convention is broken.",
+      "detail_tpl": "Move anchors under skills/",
+      "remediation_tpl": "Place all skill anchors under skills/** for consistent discovery.",
+      "approval_checklist": [
+        "Is there a reason to keep skills outside skills/?",
+        "Can anchors be moved under skills/?",
+        "Is the repo convention documented for the team?"
+      ]
+    }
+  ]
+}

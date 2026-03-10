@@ -1,0 +1,15 @@
+# 本地开发用；执行 docs/postgres-schema.sql 初始化表
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: skillscan
+      POSTGRES_PASSWORD: skillscan
+      POSTGRES_DB: skillscan
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data: {}

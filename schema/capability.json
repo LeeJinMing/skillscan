@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillscan.dev/schema/capability.json",
+  "title": "Skill Capability Schema",
+  "description": "Per-skill capability extraction result; used for policy and verdict.",
+  "type": "object",
+  "required": ["skill_id", "skill_version", "ecosystem", "capabilities"],
+  "properties": {
+    "skill_id": { "type": "string", "description": "e.g. kowl64/linux-service-triage" },
+    "skill_version": { "type": "string", "description": "git:sha | semver | unknown" },
+    "ecosystem": { "type": "string", "enum": ["moltbot", "clawdbot"] },
+    "capabilities": {
+      "type": "object",
+      "properties": {
+        "exec_shell": {
+          "type": "object",
+          "properties": {
+            "level": { "type": "string", "enum": ["suggest", "execute"] },
+            "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+          }
+        },
+        "privilege": {
+          "type": "object",
+          "properties": {
+            "requires_sudo": { "type": "boolean" },
+            "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+          }
+        },
+        "service_control": {
+          "type": "object",
+          "properties": {
+            "systemd": {
+              "type": "object",
+              "properties": {
+                "read": { "type": "boolean" },
+                "restart": { "type": "boolean" },
+                "enable_disable": { "type": "boolean" }
+              }
+            },
+            "pm2": {
+              "type": "object",
+              "properties": {
+                "read": { "type": "boolean" },
+                "restart": { "type": "boolean" },
+                "delete_all": { "type": "boolean" }
+              }
+            },
+            "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+          }
+        },
+        "filesystem": {
+          "type": "object",
+          "properties": {
+            "read_paths": { "type": "array", "items": { "type": "string" } },
+            "write_paths": { "type": "array", "items": { "type": "string" } },
+            "chmod_chown": {
+              "type": "object",
+              "properties": {
+                "recursive_possible": { "type": "boolean" },
+                "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+              }
+            },
+            "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+          }
+        },
+        "network": {
+          "type": "object",
+          "properties": {
+            "egress": { "type": "boolean" },
+            "domains": { "type": "array", "items": { "type": "string" } },
+            "ports": { "type": "array", "items": { "type": "integer" } },
+            "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+          }
+        },
+        "config_change": {
+          "type": "object",
+          "properties": {
+            "nginx": {
+              "type": "object",
+              "properties": {
+                "write": { "type": "boolean" },
+                "reload": { "type": "boolean" },
+                "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+              }
+            },
+            "dns_tls_checks": { "type": "boolean" },
+            "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+          }
+        },
+        "download_execute": {
+          "type": "object",
+          "properties": {
+            "present": { "type": "boolean" },
+            "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+          }
+        },
+        "offensive_security": {
+          "type": "object",
+          "description": "Security offensive dimension; enterprise policy can block by capability.",
+          "properties": {
+            "offensive_security": { "type": "boolean", "description": "Skill is offensive/red-team oriented" },
+            "targets_identity_systems": { "type": "boolean", "description": "Targets AD/domain controllers" },
+            "credential_access": { "type": "boolean" },
+            "lateral_movement": { "type": "boolean" },
+            "privilege_escalation": { "type": "boolean" },
+            "exploitation_guidance": { "type": "boolean", "description": "CVE exploit / weaponization guidance" },
+            "tooling_required": { "type": "array", "items": { "type": "string" }, "description": "e.g. impacket, mimikatz, bloodhound" },
+            "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "Evidence": {
+      "type": "object",
+      "required": ["file", "rule_id"],
+      "properties": {
+        "file": { "type": "string", "description": "Path relative to skill root" },
+        "line": { "type": "integer" },
+        "snippet": { "type": "string", "description": "Line or block content" },
+        "rule_id": { "type": "string" }
+      }
+    }
+  }
+}

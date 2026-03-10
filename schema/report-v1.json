@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillscan.dev/schema/report-v1.json",
+  "title": "Skill Scan Report (Contract v1)",
+  "description": "SaaS 只接收此 JSON；可追溯 + 可解释 + 可复现。evidence 必须带 file + line_start/line_end。审批粒度 MVP=repo@commit；skills[] 为未来 skill_path 审批预留。",
+  "type": "object",
+  "required": ["schema_version", "scanner", "source", "input_fingerprint", "skill", "verdict", "findings", "timing"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0" },
+    "contract_version": { "type": "string", "description": "Response contract version (e.g. 2026-02-01); bump on breaking change" },
+    "scanner": {
+      "type": "object",
+      "required": ["name", "version", "ruleset_version", "execution_mode"],
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "ruleset_version": { "type": "string" },
+        "execution_mode": { "type": "string", "enum": ["suggest_only", "allow_execute"] }
+      }
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "provider": { "type": "string", "enum": ["github", "gitlab", "local"] },
+        "repo": { "type": "string" },
+        "ref": { "type": "string" },
+        "commit_sha": { "type": "string" },
+        "default_branch": { "type": "string" }
+      }
+    },
+    "input_fingerprint": {
+      "type": "object",
+      "required": ["type", "sha256"],
+      "properties": {
+        "type": { "type": "string", "enum": ["git-tree", "content-hash"] },
+        "sha256": { "type": "string" }
+      }
+    },
+    "skill": {
+      "type": "object",
+      "required": ["ecosystem", "id"],
+      "properties": {
+        "ecosystem": { "type": "string", "enum": ["moltbot", "clawdbot"] },
+        "path": { "type": "string" },
+        "id": { "type": "string" },
+        "author": { "type": "string" },
+        "declared_version": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "required": ["status", "reason", "policy_version"],
+      "properties": {
+        "status": { "type": "string", "enum": ["allowed", "needs_approval", "blocked", "approved"], "description": "approved 仅由服务端在审批通过后返回" },
+        "reason": { "type": "string" },
+        "reason_code": { "type": "string", "description": "Stable machine-readable; see reason_code registry" },
+        "policy_version": { "type": "string" }
+      }
+    },
+    "explanations_mode": { "type": "string", "enum": ["OFFSEC_ONLY", "BLOCK_REASONS_ONLY", "APPROVAL_SIGNALS_ONLY", "NONE"], "description": "How explanations_top was chosen: OFFSEC_ONLY (OffSec block), BLOCK_REASONS_ONLY (e.g. remote-pipe), APPROVAL_SIGNALS_ONLY, NONE" },
+    "debug": {
+      "type": "object",
+      "description": "Internal only; not for end-user display. blocked_subtype=offsec|block_reasons; mode_source=explanations_mode_from.",
+      "properties": {
+        "blocked_subtype": { "type": "string" },
+        "mode_source": { "type": "string" }
+      }
+    },
+    "repo_explanation": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "text": { "type": "string" },
+        "checklist": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "skills": {
+      "type": "array",
+      "description": "本次扫描到的 skill 列表；MVP 单 skill 时含 1 项。repo 级 verdict 聚合：任一层 blocked=>blocked，否则任一层 needs_approval=>needs_approval，否则 allowed。未来 skill_path 审批按此项细化。",
+      "items": {
+        "type": "object",
+        "required": ["path", "id", "verdict"],
+        "properties": {
+          "path": { "type": "string", "description": "锚点文件相对 repo 路径" },
+          "root": { "type": "string", "description": "skill_root 相对 repo 路径" },
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "category": { "type": "string", "description": "客户端上报的 declared_category；服务端存库时写 effective_category" },
+          "declared_category": { "type": "string", "description": "从 skill.yaml 读到的原始声明（客户端上报）" },
+          "effective_category": { "type": "string", "description": "服务端计算：declared 为准，OffSec 命中则强制 offsec" },
+          "signals": { "type": "array", "items": { "type": "string" }, "description": "扫描命中信号：uses_sudo, service_control, offsec_hit, ..." },
+          "declared_version": { "type": "string" },
+          "fingerprint": { "type": "object", "description": "可复现 hash", "properties": { "algo": { "type": "string" }, "value": { "type": "string" } } },
+          "anchor_type": { "type": "string", "enum": ["skill_yaml", "skill_md"] },
+          "findings": { "type": "array", "items": { "$ref": "#/properties/findings/items" } },
+          "verdict": { "type": "object", "properties": { "status": { "type": "string", "enum": ["allowed", "needs_approval", "blocked"] } } }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "description": "扁平能力摘要，供策略与 UI 使用"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "severity", "title", "evidence"],
+        "properties": {
+          "id": { "type": "string" },
+          "severity": { "type": "string", "enum": ["critical", "high", "medium", "low", "info"] },
+          "title": { "type": "string" },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["file", "line_start", "line_end", "match"],
+              "properties": {
+                "file": { "type": "string" },
+                "line_start": { "type": "integer" },
+                "line_end": { "type": "integer" },
+                "match": { "type": "string" }
+              }
+            }
+          },
+          "recommendation": { "type": "string" }
+        }
+      }
+    },
+    "tool_summaries": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
+    "explanations": {
+      "type": "array",
+      "description": "全量解释列表（Console 展示）；repo 级 + finding 级，snippet 安全（最多 3 行/200 字）。",
+      "items": {
+        "type": "object",
+        "properties": {
+          "level": { "type": "string", "enum": ["repo", "finding"] },
+          "title": { "type": "string" },
+          "text": { "type": "string" },
+          "checklist": { "type": "array", "items": { "type": "string" } },
+          "code": { "type": "string" },
+          "snippet": { "type": "string" }
+        }
+      }
+    },
+    "explanations_top": {
+      "type": "array",
+      "description": "仅从导致 verdict 的 findings 中取 Top 3（归因+稳定排序+不同 signal/file 优先）；Action 打印此 + See console for full details.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "level": { "type": "string", "enum": ["finding"] },
+          "code": { "type": "string" },
+          "title": { "type": "string" },
+          "text": { "type": "string" },
+          "snippet": { "type": "string" },
+          "checklist": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "timing": {
+      "type": "object",
+      "required": ["started_at", "finished_at", "duration_ms"],
+      "properties": {
+        "started_at": { "type": "string", "format": "date-time" },
+        "finished_at": { "type": "string", "format": "date-time" },
+        "duration_ms": { "type": "integer" }
+      }
+    }
+  }
+}

@@ -1,0 +1,53 @@
+# Skill Governance — 企业默认策略（三条定死，能卖）
+# 1) 默认禁止 OffSec 类 skill 进入通用仓库
+# 2) 默认禁止自动执行命令（只给建议；执行必须审批）
+# 3) 允许红队隔离仓库（独立审计）
+
+version: 1
+
+defaults:
+  execution_mode: suggest_only   # suggest_only | allow_execute
+  verdict: needs_approval        # allowed | needs_approval | blocked
+  visibility: general            # general | privileged_ops | redteam
+
+repositories:
+  general:
+    allow_categories: [productivity, devops, data, web]
+    deny_categories: [offsec]    # 关键：默认拒绝
+    execution_mode: suggest_only
+
+  privileged_ops:
+    allow_categories: [devops]
+    execution_mode: suggest_only
+    require_approval_for: [sudo, service_control, write_system_paths, chmod_chown, network_download]
+
+  redteam:
+    allow_categories: [offsec]
+    execution_mode: suggest_only   # 默认不允许自动执行
+    access_control:
+      require_group: redteam       # RBAC：只有红队组可见/可用
+      require_ticket: true        # 可选：强制关联工单/授权单号
+
+rules:
+  - id: block_offsec_in_general
+    if:
+      repo: general
+      category: offsec
+    then:
+      verdict: blocked
+      reason: "OffSec skills are not allowed in General repository"
+
+  - id: block_auto_execute_everywhere
+    if:
+      requested_execution: true
+    then:
+      verdict: blocked
+      reason: "Auto-execution is disabled by policy (suggest-only)"
+
+  - id: privileged_ops_needs_approval
+    if:
+      repo: privileged_ops
+      any_capability: [sudo, service_control, write_system_paths, chmod_chown, network_download]
+    then:
+      verdict: needs_approval
+      reason: "Privileged operations require approval"

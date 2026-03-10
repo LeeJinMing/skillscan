@@ -1,0 +1,187 @@
+{
+  "schema_version": "1.0",
+  "scanner": {
+    "name": "skillscan",
+    "version": "0.1.0",
+    "ruleset_version": "mvp-1",
+    "execution_mode": "suggest_only"
+  },
+  "source": {
+    "provider": "github",
+    "repo": "demo/allowed",
+    "ref": "refs/heads/demo",
+    "commit_sha": "demo-sha",
+    "default_branch": "main"
+  },
+  "input_fingerprint": {
+    "type": "content-hash",
+    "sha256": "5d49866bfbdd287f3ef61788890302126dbca4e3a629229a1c66e34969d2a9db"
+  },
+  "skill": {
+    "ecosystem": "clawdbot",
+    "path": "SKILL.md",
+    "id": "fixture/allowed-only",
+    "author": "",
+    "declared_version": "0.1.0",
+    "title": "fixture_allowed",
+    "category": "devops"
+  },
+  "contract_version": "2026-02-01",
+  "verdict": {
+    "status": "allowed",
+    "reason": "",
+    "reason_code": "OK_ALLOWED",
+    "policy_version": "policy@mvp-1"
+  },
+  "explanations_mode": "NONE",
+  "repo_explanation": {},
+  "capabilities": {},
+  "findings": [
+    {
+      "id": "SKILL_OUTSIDE_SKILLS_DIR",
+      "rule_id": "skill-outside-skills-dir",
+      "severity": "medium",
+      "title": "Skills found outside skills/ directory (repo not following convention)",
+      "evidence": [
+        {
+          "file": "",
+          "line_start": 0,
+          "line_end": 0,
+          "match": "Move anchors under skills/"
+        }
+      ],
+      "recommendation": "Place all skills under skills/** for governance and discovery.",
+      "signal": "",
+      "supports": "approval_signal"
+    },
+    {
+      "id": "ALLOW_READONLY_DIAGNOSTICS",
+      "rule_id": "allow-readonly-diagnostics",
+      "severity": "info",
+      "title": "Read-only diagnostics",
+      "evidence": [
+        {
+          "file": "SKILL.md",
+          "line_start": 12,
+          "line_end": 12,
+          "match": "systemctl status nginx\njournalctl -u nginx -n 20\nss -tlnp\ncurl -I http://localhost/"
+        },
+        {
+          "file": "SKILL.md",
+          "line_start": 13,
+          "line_end": 13,
+          "match": "systemctl status nginx"
+        },
+        {
+          "file": "SKILL.md",
+          "line_start": 14,
+          "line_end": 14,
+          "match": "journalctl -u nginx -n 20"
+        },
+        {
+          "file": "SKILL.md",
+          "line_start": 16,
+          "line_end": 16,
+          "match": "curl -I http://localhost/"
+        }
+      ],
+      "signal": "",
+      "supports": "info"
+    }
+  ],
+  "skills": [
+    {
+      "path": "SKILL.md",
+      "root": ".",
+      "anchor_type": "skill_md",
+      "id": "fixture/allowed-only",
+      "title": "fixture_allowed",
+      "category": "devops",
+      "declared_category": "devops",
+      "effective_category": "devops",
+      "signals": [],
+      "declared_version": "0.1.0",
+      "fingerprint": {
+        "algo": "sha256",
+        "value": "7e5d752c47c0eda0fdcddbd8c8255ceff8b8595c7f88638db5a307419b3b46ca"
+      },
+      "findings": [
+        {
+          "id": "ALLOW_READONLY_DIAGNOSTICS",
+          "rule_id": "allow-readonly-diagnostics",
+          "severity": "info",
+          "title": "Read-only diagnostics",
+          "evidence": [
+            {
+              "file": "SKILL.md",
+              "line_start": 12,
+              "line_end": 12,
+              "match": "systemctl status nginx\njournalctl -u nginx -n 20\nss -tlnp\ncurl -I http://localhost/"
+            },
+            {
+              "file": "SKILL.md",
+              "line_start": 13,
+              "line_end": 13,
+              "match": "systemctl status nginx"
+            },
+            {
+              "file": "SKILL.md",
+              "line_start": 14,
+              "line_end": 14,
+              "match": "journalctl -u nginx -n 20"
+            },
+            {
+              "file": "SKILL.md",
+              "line_start": 16,
+              "line_end": 16,
+              "match": "curl -I http://localhost/"
+            }
+          ],
+          "signal": "",
+          "supports": "info"
+        }
+      ],
+      "verdict": {
+        "status": "allowed"
+      }
+    }
+  ],
+  "explanations": [
+    {
+      "level": "finding",
+      "code": "ALLOW_READONLY_DIAGNOSTICS",
+      "title": "ALLOW_READONLY_DIAGNOSTICS",
+      "text": "Evidence: SKILL.md:12-12.",
+      "snippet": "systemctl status nginx\njournalctl -u nginx -n 20\nss -tlnp",
+      "signal": "",
+      "supports": "info",
+      "file": "SKILL.md",
+      "line_start": 12,
+      "severity": "info",
+      "rule_id": "allow-readonly-diagnostics"
+    },
+    {
+      "level": "finding",
+      "code": "SKILL_OUTSIDE_SKILLS_DIR",
+      "title": "SKILL_OUTSIDE_SKILLS_DIR",
+      "text": "SKILL_OUTSIDE_SKILLS_DIR",
+      "snippet": "Move anchors under skills/",
+      "signal": "",
+      "supports": "approval_signal",
+      "file": "",
+      "line_start": 0,
+      "severity": "medium",
+      "rule_id": "skill-outside-skills-dir"
+    }
+  ],
+  "explanations_top": [],
+  "timing": {
+    "started_at": "2026-03-10T09:49:15.644859+00:00",
+    "finished_at": "2026-03-10T09:49:15.656993+00:00",
+    "duration_ms": 12
+  },
+  "debug": {
+    "blocked_subtype": "",
+    "mode_source": "explanations_mode_from"
+  }
+}

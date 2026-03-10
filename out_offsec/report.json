@@ -1,0 +1,62 @@
+{
+  "scan_version": "0.1.0",
+  "ruleset_version": "mvp-1",
+  "generated_at": "2026-02-01T14:31:20.562665+00:00",
+  "input_type": "directory",
+  "input_hash": "b7d0269b2654d802d49278594159fd08",
+  "commit_sha": "",
+  "skill_id": "example/red-team-ad",
+  "skill_version": "0.1.0",
+  "ecosystem": "clawdbot",
+  "verdict": "Blocked",
+  "risk_summary": [
+    {
+      "rule_id": "block-offsec-ad-playbook",
+      "severity": "Blocked",
+      "evidence": [
+        {
+          "file": "SKILL.md",
+          "line": 9,
+          "snippet": "This is a **test fixture** to verify that offensive security content is **Blocked**."
+        },
+        {
+          "file": "SKILL.md",
+          "line": 12,
+          "snippet": "Keywords used to trigger OFFSEC rule: Kerberoasting, BloodHound, Mimikatz, Pass-the-Hash, NTLM relay, DCSync, Golden Ticket, Impacket, CrackMapExec, Responder, credential access, lateral movement."
+        }
+      ]
+    }
+  ],
+  "verdict_reason": "Offensive security / AD exploitation guidance",
+  "endorsement_level": "None",
+  "capabilities": {
+    "offensive_security": {
+      "offensive_security": true,
+      "targets_identity_systems": true,
+      "credential_access": true,
+      "lateral_movement": true,
+      "privilege_escalation": true,
+      "exploitation_guidance": true,
+      "tooling_required": [
+        "impacket",
+        "mimikatz",
+        "bloodhound",
+        "rubeus",
+        "crackmapexec",
+        "responder"
+      ],
+      "evidence": [
+        {
+          "file": "SKILL.md",
+          "line": 9,
+          "snippet": "This is a **test fixture** to verify that offensive security content is **Blocked**."
+        },
+        {
+          "file": "SKILL.md",
+          "line": 12,
+          "snippet": "Keywords used to trigger OFFSEC rule: Kerberoasting, BloodHound, Mimikatz, Pass-the-Hash, NTLM relay, DCSync, Golden Ticket, Impacket, CrackMapExec, Responder, credential access, lateral movement."
+        }
+      ]
+    }
+  }
+}
