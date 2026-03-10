@@ -33,5 +33,6 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
+          ls -la dist/
           pip install twine
-          twine upload dist/*
+          twine upload dist/*.whl dist/*.tar.gz
