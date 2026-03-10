@@ -5,8 +5,10 @@
 ## 安装
 
 ```bash
-pip install -e .
+pip install skillscan-governance
 ```
+
+开发时：`pip install -e .`
 
 ## 快速开始
 
